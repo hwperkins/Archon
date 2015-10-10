@@ -36,13 +36,18 @@ class CSV {
         $nlsepOpt = $options['nlsep'];
         $columnsOpt = $options['columns'];
         $collineOpt = $options['colline'];
-        $colmapOpt = $options['colmap']; // TODO
+        $colmapOpt = $options['colmap'];
         $quoteOpt = $options['quote'];
         $escapeOpt = $options['escape'];
 
         $fileData = file_get_contents($fileName);
         $fileData = explode($nlsepOpt, $fileData);
 
+        /**
+         * Determines how to assign columns of the CSV
+         * First checks if options specify a line of the file to use
+         * Otherwise uses columns specified by user
+         */
         if ($columnsOpt === null) {
             $columns = $fileData[$collineOpt];
             $columns = str_getcsv($columns, $sepOpt, $quoteOpt, $escapeOpt);
@@ -51,19 +56,51 @@ class CSV {
             $columns = $columnsOpt;
         }
 
+        /**
+         * Rename columns if a colmap exists
+         * Columns which are mapped to null are flagged for removal
+         */
+        if ($colmapOpt !== null) {
+            foreach($columns as &$column) {
+                if (!isset($colmapOpt[$column])) {
+                    continue;
+                }
+
+                $column = $colmapOpt[$column];
+            }
+        }
+
+        /**
+         * Parses each trimmed line with str_getcsv as an associative array
+         * Skips lines which trim to empty string
+         */
         foreach($fileData as &$line) {
             $line = trim($line);
+
+            if ($line === '') {
+                unset($line);
+                continue;
+            }
+
             if ($line !== '') {
                 $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
-                $line = array_combine($columns, $line);
-            } else {
-                // Remove blank lines
-                unset($line);
+                $line = $this->applyColMapToColumns($line, $columns);
             }
         }
 
         $fileData = array_values($fileData);
         return $fileData;
+    }
+
+    public function applyColMapToColumns(array $row, array $columns) {
+        $newRow = [];
+        foreach($row as $i => &$column) {
+            if ($columns[$i] !== null) {
+                $newRow[$columns[$i]] = $column;
+            }
+        }
+
+        return $newRow;
     }
 
     public static function load_csv($filename, $sep, $nlsep, $columns, $colrow, $mapping, $quote_string, $escape_character) {

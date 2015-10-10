@@ -15,4 +15,20 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
+    public function testFromCSVcolMap() {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
+
+        $df = DataFrame::fromCSV($fileName, [
+            'colmap' => [
+                'a' => 'x',
+                'b' => 'y',
+                'c' => 'z'
+            ]
+        ]);
+
+        $this->assertEquals([
+            ['x' => 1, 'y' => 2, 'z' => 3],
+            ['x' => 4, 'y' => 5, 'z' => 6],
+        ], $df->toArray());
+    }
 }
