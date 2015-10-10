@@ -17,6 +17,6 @@
     "psr-4": { "Archon\\": "src/" }
   },
   "autoload-dev" : {
-    "psr-4": { "Archon\\Test\\": "test/" }
+    "psr-4": { "Archon\\Tests\\": "tests/" }
   }
 }
