@@ -2,18 +2,17 @@
 
 use Iterator;
 use ArrayAccess;
-use Closure;
-use InvalidArgumentException;
-
-use Assert\Assertion;
 
 class DataFrame implements ArrayAccess, Iterator {
 
     private $data = [];
+    private $columns = [];
+
     private $pointer = 0;
 
-    private function __construct(array $data) {
+    private function __construct(array $data, array $columns) {
         $this->data = $data;
+        $this->columns = $columns;
     }
 
     public function offsetGet($key) {
@@ -71,11 +70,19 @@ class DataFrame implements ArrayAccess, Iterator {
         }
     }
 
-    public static function fromArray(array $data) {
-        return new DataFrame($data);
+    public static function fromArray(array $data, array $options = NULL) {
+        $first_row = current($data);
+
+        $columns = isset($options['columns']) ? $options['columns'] : array_keys($first_row);
+
+        return new DataFrame($data, $columns);
     }
 
     public function toArray() {
         return $this->data;
+    }
+
+    public function columns() {
+        return $this->columns;
     }
 }
