@@ -1,0 +1,22 @@
+{
+  "name": "archon/data-frame",
+  "description": "Archon: A PHP Data Analysis Framework",
+  "license": "proprietary",
+  "require": {
+    "beberlei/assert" : "dev-master",
+    "phpoffice/phpexcel": "1.8.0",
+    "nategood/httpful": "0.2.19",
+    "twig/twig": "1.18.2",
+    "slim/slim": "2.6.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.7.*",
+    "analog/analog": "dev-master"
+  },
+  "autoload": {
+    "psr-4": { "Archon\\": "src/" }
+  },
+  "autoload-dev" : {
+    "psr-4": { "Archon\\Test\\": "test/" }
+  }
+}
