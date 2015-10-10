@@ -1,23 +1,4 @@
-<ruleset name="MSHA">
+<ruleset name="Archon">
     <description>Description of your coding standard</description>
-    <rule ref="PSR2">
-        <!-- We prefer Java-style curly braces -->
-        <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
-        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
-
-        <!-- We prefer snake_case -->
-        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
-
-        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.SpaceAfterFunction"/>
-        <exclude name="Generic.PHP.LowerCaseConstant.Found"/>
-
-        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace"/>
-        <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore"/>
-        <exclude name="Generic.Formatting.DisallowMultipleStatements.SameLine"/>
-        <exclude name="PSR2.Classes.ClassDeclaration.CloseBraceAfterBody"/>
-        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterKeyword"/>
-        <exclude name="Generic.PHP.LowerCaseKeyword.Found"/>
-        <exclude name="PSR2.Files.EndFileNewline.NoneFound"/>
-        <exclude name="Generic.Files.LineLength.TooLong"/>
-    </rule>
+    <rule ref="PSR2" />
 </ruleset>
