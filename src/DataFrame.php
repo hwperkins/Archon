@@ -10,9 +10,13 @@ class DataFrame implements ArrayAccess, Iterator {
 
     private $pointer = 0;
 
-    private function __construct(array $data, array $columns) {
+    private function __construct(array $data) {
         $this->data = $data;
-        $this->columns = $columns;
+        $this->columns = array_keys(current($data));
+    }
+
+    public function columns() {
+        return $this->columns;
     }
 
     public function offsetGet($key) {
@@ -72,17 +76,17 @@ class DataFrame implements ArrayAccess, Iterator {
 
     public static function fromArray(array $data, array $options = NULL) {
         $first_row = current($data);
-
         $columns = isset($options['columns']) ? $options['columns'] : array_keys($first_row);
 
-        return new DataFrame($data, $columns);
+        foreach ($data as &$row) {
+            $row = array_combine($columns, $row);
+        }
+
+        return new DataFrame($data);
     }
 
     public function toArray() {
         return $this->data;
     }
 
-    public function columns() {
-        return $this->columns;
-    }
 }
