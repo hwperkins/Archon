@@ -31,4 +31,41 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
             ['x' => 4, 'y' => 5, 'z' => 6],
         ], $df->toArray());
     }
+
+    public function testFromCSVcolMapToNull() {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
+
+        $df = DataFrame::fromCSV($fileName, [
+            'colmap' => [
+                'a' => 'x',
+                'b' => null,
+                'c' => 'z'
+            ]
+        ]);
+
+        $this->assertEquals([
+            ['x' => 1, 'z' => 3],
+            ['x' => 4, 'z' => 6],
+        ], $df->toArray());
+    }
+
+    public function testFromCSVcolMapToNull_2() {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
+
+        $df = DataFrame::fromCSV($fileName, [
+            'colmap' => [
+                'a' => 'x',
+                'b' => null,
+                'c' => 'z',
+                'doesnt_exist' => 'b',
+                'doesnt_exist_either' => null,
+            ]
+        ]);
+
+        $this->assertEquals([
+            ['x' => 1, 'z' => 3],
+            ['x' => 4, 'z' => 6],
+        ], $df->toArray());
+    }
+
 }

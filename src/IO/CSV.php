@@ -61,12 +61,10 @@ class CSV {
          * Columns which are mapped to null are flagged for removal
          */
         if ($colmapOpt !== null) {
-            foreach($columns as &$column) {
-                if (!isset($colmapOpt[$column])) {
-                    continue;
+            foreach ($columns as &$column) {
+                if (array_search($column, array_keys($colmapOpt)) !== false) {
+                    $column = $colmapOpt[$column];
                 }
-
-                $column = $colmapOpt[$column];
             }
         }
 
@@ -94,10 +92,13 @@ class CSV {
 
     public function applyColMapToColumns(array $row, array $columns) {
         $newRow = [];
+
         foreach($row as $i => &$column) {
-            if ($columns[$i] !== null) {
-                $newRow[$columns[$i]] = $column;
+            if ($columns[$i] === null) {
+                continue;
             }
+
+            $newRow[$columns[$i]] = $column;
         }
 
         return $newRow;
