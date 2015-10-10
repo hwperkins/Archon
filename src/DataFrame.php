@@ -16,7 +16,7 @@ class DataFrame implements ArrayAccess, Iterator {
 
     }
 
-    public function to_array() {
+    public function toArray() {
         return $this->data;
     }
 

@@ -4,8 +4,9 @@ use Archon\DataFrame;
 
 class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
 
-    public function test_from_array() {
-        $df = DataFrame::from_array(['a', 'b', 'c']);
+    public function testFromArray() {
+        $df = DataFrame::fromArray(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $df->toArray());
     }
 
 }
