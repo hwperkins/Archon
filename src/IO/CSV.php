@@ -10,6 +10,10 @@ class CSV {
     const DEFAULT_ESCAPE_CHARACTER = "\\";
     const DEFAULT_COLUMN_FILE_LINE = 0;
 
+    private function __construct() {
+
+    }
+
     public static function fromFile($fileName, array $options) {
         $csv = new CSV();
         $options = $csv->setDefaultOptions($options);
