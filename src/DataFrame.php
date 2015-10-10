@@ -12,32 +12,8 @@ class DataFrame implements ArrayAccess, Iterator {
     private $data = [];
     private $pointer = 0;
 
-    public function __construct(array $data, array $columns = NULL) {
-        if ($this->is_valid_2d_array($data) === FALSE) {
-            throw new InvalidArgumentException('DataFrame data is not a valid two-dimensional array.');
-        };
+    private function __construct(array $data, array $columns = NULL) {
 
-        $this->data = $data;
-    }
-
-    private function is_valid_2d_array(array $array) {
-        if (is_array($array) === FALSE) return FALSE;
-        if (count($array) <= 0) return FALSE;
-
-        $first_element = $this->first_element_of($array);
-
-        foreach($array as $row) {
-            if (is_array($row) === FALSE) return FALSE;
-            if (count($row) !== count($first_element)) return FALSE;
-        }
-
-        return TRUE;
-    }
-
-    private function first_element_of(array &$array) {
-        $first_element = array_shift($array);
-        $array = array_unshift($array, $first_element);
-        return $first_element;
     }
 
     public function to_array() {
@@ -50,17 +26,9 @@ class DataFrame implements ArrayAccess, Iterator {
         return new DataFrame($columns=[$key], $data=$col);
     }
 
-    public function __get($key) {
-        return $this->offsetGet($key);
-    }
-
     public function offsetSet($key, $value) {
         $this->columns[] = $key;
         foreach($this as $row) $row[$key] = $value;
-    }
-
-    public function __set($key, $value) {
-        $this->offsetSet($key, $value);
     }
 
     public function current() {
@@ -83,16 +51,7 @@ class DataFrame implements ArrayAccess, Iterator {
         $this->pointer = 0;
     }
 
-    private function apply(Closure $callback) {
-        foreach($this as $row) {
-            $callback($row);
-        }
-    }
-
     public function offsetExists($offset) {
-        $this->apply(function($row) {
-
-        });
         foreach($this as $row) {
             if (!array_key_exists($offset, $row)) {
                 return FALSE;
