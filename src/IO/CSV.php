@@ -4,6 +4,64 @@ use RuntimeException;
 
 class CSV {
 
+    const DEFAULT_SEGMENT_SEPARATOR = ',';
+    const DEFAULT_NEWLINE_SEPARATOR = "\n";
+    const DEFAULT_QUOTE_STRING = "\"";
+    const DEFAULT_ESCAPE_CHARACTER = "\\";
+    const DEFAULT_COLUMN_FILE_LINE = 0;
+
+    public static function fromFile($fileName, array $options) {
+        $csv = new CSV();
+        $options = $csv->setDefaultOptions($options);
+        return $csv->loadFile($fileName, $options);
+    }
+
+    private function setDefaultOptions(array &$options) {
+        $options['sep'] = isset($options['sep']) ? $options['sep'] : self::DEFAULT_SEGMENT_SEPARATOR;
+        $options['nlsep'] = isset($options['nlsep']) ? $options['nlsep'] : self::DEFAULT_NEWLINE_SEPARATOR;
+        $options['columns'] = isset($options['columns']) ? $options['columns'] : null;
+        $options['colline'] = isset($options['colline']) ? $options['colline'] : self::DEFAULT_COLUMN_FILE_LINE;
+        $options['colmap'] = isset($options['colmap']) ? $options['colmap'] : null;
+        $options['quote'] = isset($options['quote']) ? $options['quote'] : self::DEFAULT_QUOTE_STRING;
+        $options['escape'] = isset($options['escape']) ? $options['escape'] : self::DEFAULT_ESCAPE_CHARACTER;
+        return $options;
+    }
+
+    private function loadFile($fileName, array $options) {
+        $sepOpt = $options['sep'];
+        $nlsepOpt = $options['nlsep'];
+        $columnsOpt = $options['columns'];
+        $collineOpt = $options['colline'];
+        $colmapOpt = $options['colmap']; // TODO
+        $quoteOpt = $options['quote'];
+        $escapeOpt = $options['escape'];
+
+        $fileData = file_get_contents($fileName);
+        $fileData = explode($nlsepOpt, $fileData);
+
+        if ($columnsOpt === null) {
+            $columns = $fileData[$collineOpt];
+            $columns = str_getcsv($columns, $sepOpt, $quoteOpt, $escapeOpt);
+            unset($fileData[$collineOpt]);
+        } else {
+            $columns = $columnsOpt;
+        }
+
+        foreach($fileData as &$line) {
+            $line = trim($line);
+            if ($line !== '') {
+                $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
+                $line = array_combine($columns, $line);
+            } else {
+                // Remove blank lines
+                unset($line);
+            }
+        }
+
+        $fileData = array_values($fileData);
+        return $fileData;
+    }
+
     public static function load_csv($filename, $sep, $nlsep, $columns, $colrow, $mapping, $quote_string, $escape_character) {
         $pre_csv = trim(file_get_contents($filename));
         $pre_csv = explode($nlsep, $pre_csv);
@@ -45,10 +103,7 @@ class CSV {
         }
 
         // If we specify no custom mapping then the CSV is fully parsed at this moment
-        if ($mapping === NULL) return [
-            'columns' => $columns,
-            'data' => $file_data
-        ];
+        if ($mapping === NULL) return $file_data;
 
         if (!is_array($mapping)) throw new RuntimeException("Error: CSV Mapping must be associative array.");
 
@@ -83,10 +138,7 @@ class CSV {
             $file_line = array_combine($columns, array_values($file_line));
         }
 
-        return [
-            'columns' => $columns,
-            'data' => $file_data
-        ];
+        return $file_data;
     }
 
     public static function save_csv($filename, array $data, $sep, $overwrite) {
