@@ -56,4 +56,19 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    public function testOffsetGet() {
+        $input = [
+            ['a' => 1, 'b' => 2],
+            ['a' => 3, 'b' => 4],
+            ['a' => 5, 'b' => 6],
+        ];
+
+        $df = DataFrame::fromArray($input);
+        $a = $df['a'];
+        $b = $df['b'];
+
+        $this->assertEquals([['a' => 1],['a' => 3],['a' => 5]], $a->toArray());
+        $this->assertEquals([['b' => 2],['b' => 4],['b' => 6]], $b->toArray());
+        $this->assertEquals($input, $df->toArray());
+    }
 }

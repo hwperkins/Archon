@@ -23,9 +23,22 @@ class DataFrameCore implements ArrayAccess, Iterator {
         return $this->columns;
     }
 
+    /**
+     * Allows user retrieve DataFrame subsets from a two-dimensional array by simply requesting an element of
+     * the instantiated DataFrame.
+     *
+     * ie: $foo_df = $df['foo'];
+     *
+     * @param mixed $key
+     * @return DataFrame
+     */
     public function offsetGet($key) {
-        $col = array_column($this->data, $key);
-        return DataFrame::fromArray($col);
+        $data = array_column($this->data, $key);
+        foreach($data as &$row) {
+            $row = [$key => $row];
+        }
+
+        return new DataFrame($data);
     }
 
     public function offsetSet($key, $value) {
