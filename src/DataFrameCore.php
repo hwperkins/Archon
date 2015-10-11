@@ -5,7 +5,6 @@ use Closure;
 use Countable;
 use Iterator;
 use ArrayAccess;
-use RuntimeException;
 
 /**
  * @link https://github.com/HWGehring/Archon for the canonical source repository
