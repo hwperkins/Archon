@@ -42,4 +42,18 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(['a', 'b', 'c'], $df->columns());
     }
 
+    public function testForEach() {
+        $input = [
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+        ];
+
+        $df = DataFrame::fromArray($input);
+
+        foreach($df as $i => $row) {
+            $this->assertEquals($row, $input[$i]);
+        }
+    }
+
 }
