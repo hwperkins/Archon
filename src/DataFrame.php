@@ -31,6 +31,11 @@ final class DataFrame extends DataFrameCore {
         return $output;
     }
 
+    /**
+     * @param array $data
+     * @param array $options
+     * @return DataFrame
+     */
     public static function fromArray(array $data, array $options = []) {
         $first_row = current($data);
         $columns = isset($options['columns']) ? $options['columns'] : array_keys($first_row);
