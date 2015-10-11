@@ -1,6 +1,7 @@
 <?php namespace Archon;
 
 use Archon\IO\CSV;
+use Archon\IO\FWF;
 use Archon\IO\HTML;
 
 /**
@@ -23,6 +24,12 @@ final class DataFrame extends DataFrameCore {
         $csv = new CSV($fileName);
         $csv->saveFile($this->data, $options);
         return $this;
+    }
+
+    public static function fromFWF($fileName, array $colSpecs, array $options = []) {
+        $fwf = new FWF($fileName);
+        $data = $fwf->loadFile($colSpecs, $options);
+        return new DataFrame($data);
     }
 
     public function toHTML($options = []) {
