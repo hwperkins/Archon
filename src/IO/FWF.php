@@ -4,18 +4,21 @@
  * @link https://github.com/HWGehring/Archon for the canonical source repository
  * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
  */
-class FWF {
+class FWF
+{
 
     private $defaultOptions = [
         'include' => null,
         'exclude' => null
     ];
 
-    public function __construct($fileName) {
+    public function __construct($fileName)
+    {
         $this->fileName = $fileName;
     }
 
-    public function loadFile(array $colSpecs, array $options = []) {
+    public function loadFile(array $colSpecs, array $options = [])
+    {
         $fileName = $this->fileName;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
@@ -31,7 +34,7 @@ class FWF {
         $fileData = $includeRegexOpt ? preg_grep($includeRegexOpt, $fileData) : $fileData;
         $fileData = $excludeRegexOpt ? preg_grep($excludeRegexOpt, $fileData, PREG_GREP_INVERT) : $fileData;
 
-        foreach($fileData as &$line) {
+        foreach ($fileData as &$line) {
             $line = $this->applyColSpecs($line, $colSpecs);
         }
 
@@ -39,9 +42,10 @@ class FWF {
         return $fileData;
     }
 
-    private function applyColSpecs($data, array $colSpecs) {
+    private function applyColSpecs($data, array $colSpecs)
+    {
         $result = [];
-        foreach($colSpecs as $colName => $coords) {
+        foreach ($colSpecs as $colName => $coords) {
             $result[$colName] = trim(substr($data, $coords[0], $coords[1] - $coords[0]));
         }
         return $result;
