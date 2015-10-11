@@ -6,8 +6,8 @@ php:
   - nightly
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source --dev
+  - wget https://getcomposer.org/composer.phar
+  - php composer.phar install --no-interaction --prefer-source --dev
   - mkdir -p build/logs
 
 script:
