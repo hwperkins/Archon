@@ -9,24 +9,37 @@
 
 final class HTML {
 
+    const DEFAULT_READABLE_HTML = false;
+
     public function __construct(array $data) {
         $this->data = $data;
     }
 
+    private function setDefaultOptions(array $options) {
+        $options['readable'] = isset($options['readable']) ? $options['readable'] : self::DEFAULT_READABLE_HTML;
+        return $options;
+    }
+
     public function render(array $options) {
         $data = $this->data;
+        $options = $this->setDefaultOptions($options);
+        $readableOpt = $options['readable'];
 
         $columns = current($data);
         $columns = array_keys($columns);
         $columns = $this->wrapTRTH($columns);
 
+        $header = $this->wrapTHead($columns);
+        $footer = $this->wrapTFoot($columns);
+
         foreach($data as &$row) {
             $row = $this->wrapTRTH($row);
         }
 
-        $data = '<thead>'.$columns.'</thead><tfoot>'.$columns.'</tfoot><tbody>'.implode('', $data).'</tbody>';
+        $data = implode('', $data);
+        $data = $this->wrapTBody($data);
+        $data = $header.$footer.$data;
         $data = $this->wrapTable($data);
-
         return $data;
     }
 
@@ -34,12 +47,20 @@ final class HTML {
         return '<tr><th>'.implode('</th><th>', $data).'</th></tr>';
     }
 
+    private function wrapTHead($data) {
+        return '<thead>'.$data.'</thead>';
+    }
+
+    private function wrapTFoot($data) {
+        return '<tfoot>'.$data.'</tfoot>';
+    }
+
+    private function wrapTBody($data) {
+        return '<tbody>'.$data.'</tbody>';
+    }
+
     private function wrapTable($data) {
-        return "<table>".$data."</table>";
+        return '<table>'.$data.'</table>';
     }
 
-    private function setDefaultOptions(array $options) {
-
-        return $options;
-    }
 }
