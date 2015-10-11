@@ -33,21 +33,44 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable {
         return $this->data[$index];
     }
 
-    public function hasColumn($column_name, $strict = false) {
-        if (array_search($column_name, $this->columns) === false) {
-            if ($strict === true) {
-                throw new RuntimeException("Error: {$column_name} doesn't exist in DataFrame.");
+    public function apply(Closure $f) {
+        if (count($this->columns()) > 1) {
+            foreach($this->data as $i => &$row) {
+                $row = $f($row);
             }
+        }
+
+        if (count($this->columns()) === 1) {
+            foreach ($this->data as $i => &$row) {
+                $row[key($row)] = $f($row[key($row)]);
+            }
+        }
+
+        return $this;
+    }
+
+    public function mustHaveColumn($columnName) {
+        if ($this->hasColumn($columnName) === false) {
+            throw new DataFrameException("Error: {$columnName} doesn't exist in DataFrame.");
+        }
+    }
+
+    public function hasColumn($columnName) {
+        if (array_search($columnName, $this->columns) === false) {
             return false;
         } else {
             return true;
         }
     }
 
-    private function addColumn($column_name) {
-        if (!$this->hasColumn($column_name)) {
-            $this->columns[] = $column_name;
+    private function addColumn($columnName) {
+        if (!$this->hasColumn($columnName)) {
+            $this->columns[] = $columnName;
         }
+    }
+
+    public function removeColumn($columnName) {
+        unset($this[$columnName]);
     }
 
     /* ****************************************************************************************************************
@@ -78,6 +101,8 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable {
      * @return DataFrame
      */
     public function offsetGet($key) {
+        $this->mustHaveColumn($key);
+
         $data = array_map(function($el) use($key) { return $el[$key]; }, $this->data);
 
         foreach($data as &$row) {
@@ -104,7 +129,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable {
         }
 
         if (count($df) != count($this)) {
-            throw new DataFrameException("Source and target DataFrames have identical number of rows.");
+            throw new DataFrameException("Source and target DataFrames must have identical number of rows.");
         }
 
         $this->addColumn($targetColumn);
@@ -128,9 +153,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable {
     }
 
     public function offsetUnset($offset) {
-        if (!isset($this[$offset])) {
-            throw new \RuntimeException("Key {$offset} not found in DataFrame.");
-        }
+        $this->mustHaveColumn($offset);
 
         foreach($this as $i => $row) {
             unset($this->data[$i][$offset]);

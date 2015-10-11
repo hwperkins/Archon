@@ -77,17 +77,17 @@ class CSV {
          * Parses each trimmed line with str_getcsv as an associative array
          * Skips lines which trim to empty string
          */
-        foreach($fileData as &$line) {
+        foreach($fileData as $i => $line) {
             $line = trim($line);
 
             if ($line === '') {
-                unset($line);
+                unset($fileData[$i]);
                 continue;
             }
 
             if ($line !== '') {
                 $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
-                $line = $this->applyColMapToColumns($line, $columns);
+                $fileData[$i] = $this->applyColMapToColumns($line, $columns);
             }
         }
 
@@ -117,7 +117,7 @@ class CSV {
         $sepOpt = $options['sep'];
         $quoteOpt = $options['quote'];
 
-        if (file_exists($fileName) and $overwriteOpt !== false) {
+        if (file_exists($fileName) and $overwriteOpt === false) {
             throw new RuntimeException("Write failed. File {$fileName} exists.");
         }
 
