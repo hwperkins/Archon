@@ -1,12 +1,9 @@
 <?php namespace Archon\IO;
 
 /**
- * Created by PhpStorm.
- * User: hwgehring
- * Date: 10/10/2015
- * Time: 9:16 PM
+ * @link https://github.com/HWGehring/Archon for the canonical source repository
+ * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
  */
-
 final class HTML {
 
     const DEFAULT_READABLE_HTML = false;

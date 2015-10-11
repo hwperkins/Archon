@@ -1,5 +1,9 @@
 <?php namespace Archon\IO;
 
+/**
+ * @link https://github.com/HWGehring/Archon for the canonical source repository
+ * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ */
 class FWF {
 
     public static function load_fwf($filename, $colspecs, $is_good_line=NULL, $is_bad_line=NULL, $header=FALSE) {

@@ -3,6 +3,10 @@
 use Archon\IO\CSV;
 use Archon\IO\HTML;
 
+/**
+ * @link https://github.com/HWGehring/Archon for the canonical source repository
+ * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ */
 final class DataFrame extends DataFrameCore {
 
     protected function __construct(array $data) {
