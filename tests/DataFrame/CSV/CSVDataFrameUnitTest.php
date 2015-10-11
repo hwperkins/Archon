@@ -2,9 +2,11 @@
 
 use Archon\DataFrame;
 
-class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
+class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function testFromCSV() {
+    public function testFromCSV()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
 
         $df = DataFrame::fromCSV($fileName);
@@ -15,7 +17,8 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
-    public function testFromCSVNoHeader() {
+    public function testFromCSVNoHeader()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
 
         $df = DataFrame::fromCSV($fileName, ['columns' => ['x', 'y', 'z']]);
@@ -27,7 +30,8 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
-    public function testFromCSVcolMap() {
+    public function testFromCSVcolMap()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
 
         $df = DataFrame::fromCSV($fileName, [
@@ -44,7 +48,8 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
-    public function testFromCSVcolMapToNull() {
+    public function testFromCSVcolMapToNull()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
 
         $df = DataFrame::fromCSV($fileName, [
@@ -61,7 +66,8 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
-    public function testFromCSVcolMapToNull_2() {
+    public function testFromCSVcolMapToNull2()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
 
         $df = DataFrame::fromCSV($fileName, [
@@ -80,7 +86,8 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         ], $df->toArray());
     }
 
-    public function testSaveCSV() {
+    public function testSaveCSV()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVSave.csv';
         if (file_exists($fileName)) {
             unlink($fileName);
@@ -110,5 +117,4 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($expected, $data);
     }
-
 }
