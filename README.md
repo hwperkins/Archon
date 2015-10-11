@@ -1,0 +1,1 @@
+[![Coverage Status](https://coveralls.io/repos/HWGehring/Archon/badge.svg?branch=master&service=github)](https://coveralls.io/github/HWGehring/Archon?branch=master)
