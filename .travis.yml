@@ -7,4 +7,12 @@ php:
   - nightly
 
 before_script:
-  - composer install
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction --prefer-source --dev
+  - mkdir -p build/logs
+
+script:
+  - phpunit --configuration build/phpunit.xml
+
+after_success:
+  - php vendor/bin/coveralls -v

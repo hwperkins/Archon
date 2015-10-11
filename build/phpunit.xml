@@ -2,6 +2,9 @@
 <phpunit bootstrap="../vendor/autoload.php"
          backupGlobals="false"
          backupStaticAttributes="false"
+         convertErrorsToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false"
          strict="true"
          verbose="true">
 
