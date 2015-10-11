@@ -1,13 +1,10 @@
 {
-  "name": "archon/data-frame",
-  "description": "Archon: A PHP Data Analysis Framework",
+  "name": "archon/dataframe",
+  "description": "The Archon PHP Data Analysis Library",
   "license": "proprietary",
   "require": {
-    "beberlei/assert" : "dev-master",
     "phpoffice/phpexcel": "1.8.0",
-    "nategood/httpful": "0.2.19",
-    "twig/twig": "1.18.2",
-    "slim/slim": "2.6.2"
+    "nategood/httpful": "0.2.19"
   },
   "require-dev": {
     "phpunit/phpunit": "4.7.*",
