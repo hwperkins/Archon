@@ -14,7 +14,28 @@ final class HTML {
     }
 
     public function render(array $options) {
+        $data = $this->data;
 
+        $columns = current($data);
+        $columns = array_keys($columns);
+        $columns = $this->wrapTRTH($columns);
+
+        foreach($data as &$row) {
+            $row = $this->wrapTRTH($row);
+        }
+
+        $data = '<thead>'.$columns.'</thead><tfoot>'.$columns.'</tfoot><tbody>'.implode('', $data).'</tbody>';
+        $data = $this->wrapTable($data);
+
+        return $data;
+    }
+
+    private function wrapTRTH(array $data) {
+        return '<tr><th>'.implode('</th><th>', $data).'</th></tr>';
+    }
+
+    private function wrapTable($data) {
+        return "<table>".$data."</table>";
     }
 
     private function setDefaultOptions(array $options) {
