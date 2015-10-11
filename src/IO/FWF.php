@@ -6,19 +6,18 @@
  */
 class FWF {
 
+    private $defaultOptions = [
+        'include' => null,
+        'exclude' => null
+    ];
+
     public function __construct($fileName) {
         $this->fileName = $fileName;
     }
 
-    private function setDefaultOptions(array &$options) {
-        $options['include'] = isset($options['include']) ? $options['include'] : null;
-        $options['exclude'] = isset($options['exclude']) ? $options['exclude'] : null;
-        return $options;
-    }
-
     public function loadFile(array $colSpecs, array $options = []) {
         $fileName = $this->fileName;
-        $options = $this->setDefaultOptions($options);
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
         $includeRegexOpt = $options['include'];
         $excludeRegexOpt = $options['exclude'];

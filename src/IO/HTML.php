@@ -6,20 +6,17 @@
  */
 final class HTML {
 
-    const DEFAULT_READABLE_HTML = false;
+    private $defaultOptions = [
+        'readable' => false
+    ];
 
     public function __construct(array $data) {
         $this->data = $data;
     }
 
-    private function setDefaultOptions(array $options) {
-        $options['readable'] = isset($options['readable']) ? $options['readable'] : self::DEFAULT_READABLE_HTML;
-        return $options;
-    }
-
     public function render(array $options) {
         $data = $this->data;
-        $options = $this->setDefaultOptions($options);
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $readableOpt = $options['readable'];
 
         $columns = current($data);

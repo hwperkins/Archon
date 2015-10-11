@@ -8,34 +8,25 @@ use RuntimeException;
  */
 class CSV {
 
-    const DEFAULT_SEGMENT_SEPARATOR = ',';
-    const DEFAULT_NEWLINE_SEPARATOR = "\n";
-    const DEFAULT_QUOTE_STRING = "\"";
-    const DEFAULT_ESCAPE_CHARACTER = "\\";
-    const DEFAULT_COLUMN_FILE_LINE = 0;
+    private $defaultOptions = [
+        'sep' => ',',
+        'nlsep' => "\n",
+        'columns' => null,
+        'colline' => 0,
+        'colmap' => null,
+        'quote' => "\"",
+        'escape' => "\\",
 
-    const DEFAULT_OVERWRITE_FILE = false;
+        'overwrite' => false
+    ];
 
     public function __construct($fileName) {
         $this->fileName = $fileName;
     }
 
-    private function setDefaultOptions(array &$options) {
-        $options['sep'] = isset($options['sep']) ? $options['sep'] : self::DEFAULT_SEGMENT_SEPARATOR;
-        $options['nlsep'] = isset($options['nlsep']) ? $options['nlsep'] : self::DEFAULT_NEWLINE_SEPARATOR;
-        $options['columns'] = isset($options['columns']) ? $options['columns'] : null;
-        $options['colline'] = isset($options['colline']) ? $options['colline'] : self::DEFAULT_COLUMN_FILE_LINE;
-        $options['colmap'] = isset($options['colmap']) ? $options['colmap'] : null;
-        $options['quote'] = isset($options['quote']) ? $options['quote'] : self::DEFAULT_QUOTE_STRING;
-        $options['escape'] = isset($options['escape']) ? $options['escape'] : self::DEFAULT_ESCAPE_CHARACTER;
-
-        $options['overwrite'] = isset($options['overwrite']) ? $options['overwrite'] : self::DEFAULT_OVERWRITE_FILE;
-        return $options;
-    }
-
     public function loadFile(array $options = []) {
         $fileName = $this->fileName;
-        $options = $this->setDefaultOptions($options);
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
         $sepOpt = $options['sep'];
         $nlsepOpt = $options['nlsep'];
@@ -111,7 +102,7 @@ class CSV {
 
     public function saveFile(array $data, array $options = []) {
         $fileName = $this->fileName;
-        $options = $this->setDefaultOptions($options);
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
         $overwriteOpt = $options['overwrite'];
         $sepOpt = $options['sep'];
