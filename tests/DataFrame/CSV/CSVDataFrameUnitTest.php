@@ -1,4 +1,4 @@
-<?php namespace Archon\Tests\DataFrame\Core;
+<?php namespace Archon\Tests\DataFrame\CSV;
 
 use Archon\DataFrame;
 
