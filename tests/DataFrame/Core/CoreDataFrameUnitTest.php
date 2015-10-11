@@ -2,9 +2,16 @@
 
 use Archon\DataFrame;
 
-class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
+class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function setUp() {
+    /**
+     * @var DataFrame
+     */
+    private $df;
+
+    public function setUp()
+    {
         $this->input = [
             ['a' => 1, 'b' => 2, 'c' => 3],
             ['a' => 4, 'b' => 5, 'c' => 6],
@@ -14,15 +21,18 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->df = DataFrame::fromArray($this->input);
     }
 
-    public function testFromArray() {
+    public function testFromArray()
+    {
         $this->assertEquals($this->input, $this->df->toArray());
     }
 
-    public function testColumns() {
+    public function testColumns()
+    {
         $this->assertEquals(['a', 'b', 'c'], $this->df->columns());
     }
 
-    public function testRemoveColumn() {
+    public function testRemoveColumn()
+    {
         $df = $this->df;
 
         $df->removeColumn('a');
@@ -35,13 +45,15 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testForEach() {
-        foreach($this->df as $i => $row) {
+    public function testForEach()
+    {
+        foreach ($this->df as $i => $row) {
             $this->assertEquals($row, $this->input[$i]);
         }
     }
 
-    public function testOffsetGet() {
+    public function testOffsetGet()
+    {
         $a = $this->df['a'];
         $b = $this->df['b'];
 
@@ -49,7 +61,8 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals([['b' => 2], ['b' => 5], ['b' => 8]], $b->toArray());
     }
 
-    public function testOffsetSet_value() {
+    public function testOffsetSetValue()
+    {
         $df = $this->df;
         $df['a'] = 321;
 
@@ -62,11 +75,12 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testOffsetSet_closure() {
+    public function testOffsetSetClosure()
+    {
         $df = $this->df;
 
-        $add = function($x) {
-            return function($y) use ($x) {
+        $add = function ($x) {
+            return function ($y) use ($x) {
                 return $x + $y;
             };
         };
@@ -84,7 +98,8 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testOffsetSet_dataframe() {
+    public function testOffsetSetDataframe()
+    {
         $df = $this->df;
 
         $df['a'] = $df['b'];
@@ -98,10 +113,13 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testOffsetSet_newColumn() {
+    public function testOffsetSetNewColumn()
+    {
         $df = $this->df;
 
-        $df['d'] = $df['c']->apply(function ($el) { return $el + 1; });
+        $df['d'] = $df['c']->apply(function ($el) {
+            return $el + 1;
+        });
 
         $expected = [
             ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4],
@@ -112,10 +130,11 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testApplyDataFrame() {
+    public function testApplyDataFrame()
+    {
         $df = $this->df;
 
-        $df->apply(function($row) {
+        $df->apply(function ($row) {
             $row['b'] = $row['a'] + 2;
             $row['c'] = $row['b'] + 2;
             return $row;
@@ -130,7 +149,8 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $df->toArray());
     }
 
-    public function testIsset() {
+    public function testIsset()
+    {
         $this->assertEquals(true, isset($this->df['a']));
         $this->assertEquals(false, isset($this->df['foo']));
     }
