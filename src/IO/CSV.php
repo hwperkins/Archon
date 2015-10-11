@@ -121,8 +121,8 @@ class CSV {
             throw new RuntimeException("Write failed. File {$fileName} exists.");
         }
 
-        $quoted = function($el) use ($quoteOpt) {
-            return $quoteOpt . $el . $quoteOpt;
+        $quoted = function($elem) use ($quoteOpt) {
+            return $quoteOpt . $elem . $quoteOpt;
         };
 
         $header = current($data);
