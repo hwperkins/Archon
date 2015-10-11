@@ -8,8 +8,7 @@
   "license": "BSD-3-Clause",
   "require": {
     "php": ">=5.3",
-    "phpoffice/phpexcel": "1.8.0",
-    "nategood/httpful": "0.2.19"
+    "phpoffice/phpexcel": "1.8.0"
   },
   "require-dev": {
     "phpunit/phpunit": "4.7.*",

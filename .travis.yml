@@ -6,12 +6,11 @@ php:
   - nightly
 
 before_script:
-  - rm -rf .composer
   - wget http://getcomposer.org/composer.phar
   - php composer.phar install --dev --no-interaction
+  - mkdir -p build/logs
 
 script:
-  - mkdir -p build/logs
   - phpunit --coverage-clover build/logs/clover.xml --configuration build/phpunit.xml
 
 after_success:
