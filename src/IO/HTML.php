@@ -18,7 +18,7 @@ final class HTML
         $this->data = $data;
     }
 
-    public function render(array $options)
+    public function renderTable(array $options)
     {
         $data = $this->data;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);

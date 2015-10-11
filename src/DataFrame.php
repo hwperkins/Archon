@@ -8,33 +8,39 @@ use Archon\IO\HTML;
  * @link https://github.com/HWGehring/Archon for the canonical source repository
  * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
  */
-final class DataFrame extends DataFrameCore {
+final class DataFrame extends DataFrameCore
+{
 
-    protected function __construct(array $data) {
+    protected function __construct(array $data)
+    {
         parent::__construct($data);
     }
 
-    public static function fromCSV($fileName, $options = []) {
+    public static function fromCSV($fileName, $options = [])
+    {
         $csv = new CSV($fileName);
         $data = $csv->loadFile($options);
         return new DataFrame($data);
     }
 
-    public function toCSV($fileName, $options = []) {
+    public function toCSV($fileName, $options = [])
+    {
         $csv = new CSV($fileName);
         $csv->saveFile($this->data, $options);
         return $this;
     }
 
-    public static function fromFWF($fileName, array $colSpecs, array $options = []) {
+    public static function fromFWF($fileName, array $colSpecs, array $options = [])
+    {
         $fwf = new FWF($fileName);
         $data = $fwf->loadFile($colSpecs, $options);
         return new DataFrame($data);
     }
 
-    public function toHTML($options = []) {
+    public function toHTML($options = [])
+    {
         $html = new HTML($this->data);
-        $output = $html->render($options);
+        $output = $html->renderTable($options);
         return $output;
     }
 
@@ -43,9 +49,10 @@ final class DataFrame extends DataFrameCore {
      * @param array $options
      * @return DataFrame
      */
-    public static function fromArray(array $data, array $options = []) {
-        $first_row = current($data);
-        $columns = isset($options['columns']) ? $options['columns'] : array_keys($first_row);
+    public static function fromArray(array $data, array $options = [])
+    {
+        $firstRow = current($data);
+        $columns = isset($options['columns']) ? $options['columns'] : array_keys($firstRow);
 
         foreach ($data as &$row) {
             $row = array_combine($columns, $row);
@@ -54,8 +61,8 @@ final class DataFrame extends DataFrameCore {
         return new DataFrame($data);
     }
 
-    public function toArray() {
+    public function toArray()
+    {
         return $this->data;
     }
-
 }
