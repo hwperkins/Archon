@@ -26,7 +26,7 @@ final class DataFrame extends DataFrameCore
     public function toCSV($fileName, $options = [])
     {
         $csv = new CSV($fileName);
-        $csv->saveFile($this->data, $options);
+        $csv->saveFile($this->_data, $options);
         return $this;
     }
 
@@ -39,7 +39,7 @@ final class DataFrame extends DataFrameCore
 
     public function toHTML($options = [])
     {
-        $html = new HTML($this->data);
+        $html = new HTML($this->_data);
         $output = $html->renderTable($options);
         return $output;
     }
@@ -63,6 +63,6 @@ final class DataFrame extends DataFrameCore
 
     public function toArray()
     {
-        return $this->data;
+        return $this->_data;
     }
 }

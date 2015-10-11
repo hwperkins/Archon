@@ -13,39 +13,39 @@ use ArrayAccess;
 class DataFrameCore implements ArrayAccess, Iterator, Countable
 {
 
-    /* ****************************************************************************************************************
-     ********************************************** Core Implementation ***********************************************
-     *****************************************************************************************************************/
+    /* *************************************************************************
+     *************************** Core Implementation ***************************
+     **************************************************************************/
 
-    protected $data = [];
-    protected $columns = [];
+    protected $_data = [];
+    protected $_columns = [];
 
     protected function __construct(array $data)
     {
-        $this->data = $data;
-        $this->columns = array_keys(current($data));
+        $this->_data = $data;
+        $this->_columns = array_keys(current($data));
     }
 
     public function columns()
     {
-        return $this->columns;
+        return $this->_columns;
     }
 
     public function getIndex($index)
     {
-        return $this->data[$index];
+        return $this->_data[$index];
     }
 
     public function apply(Closure $f)
     {
         if (count($this->columns()) > 1) {
-            foreach ($this->data as $i => &$row) {
+            foreach ($this->_data as $i => &$row) {
                 $row = $f($row);
             }
         }
 
         if (count($this->columns()) === 1) {
-            foreach ($this->data as $i => &$row) {
+            foreach ($this->_data as $i => &$row) {
                 $row[key($row)] = $f($row[key($row)]);
             }
         }
@@ -56,13 +56,14 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     public function mustHaveColumn($columnName)
     {
         if ($this->hasColumn($columnName) === false) {
-            throw new DataFrameException("Error: {$columnName} doesn't exist in DataFrame.");
+            $msg = "Error: {$columnName} doesn't exist in DataFrame.";
+            throw new DataFrameException($msg);
         }
     }
 
     public function hasColumn($columnName)
     {
-        if (array_search($columnName, $this->columns) === false) {
+        if (array_search($columnName, $this->_columns) === false) {
             return false;
         } else {
             return true;
@@ -72,7 +73,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     private function addColumn($columnName)
     {
         if (!$this->hasColumn($columnName)) {
-            $this->columns[] = $columnName;
+            $this->_columns[] = $columnName;
         }
     }
 
@@ -81,9 +82,9 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         unset($this[$columnName]);
     }
 
-    /* ****************************************************************************************************************
-     ******************************************* ArrayAccess Implementation *******************************************
-     *****************************************************************************************************************/
+    /* *************************************************************************
+     ************************ ArrayAccess Implementation ***********************
+     **************************************************************************/
 
     /**
      * @param mixed $offset
@@ -101,8 +102,8 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Allows user retrieve DataFrame subsets from a two-dimensional array by simply requesting an element of
-     * the instantiated DataFrame.
+     * Allows user retrieve DataFrame subsets from a two-dimensional array by
+     * simply requesting an element of the instantiated DataFrame.
      *
      * ie: $foo_df = $df['foo'];
      *
@@ -113,9 +114,11 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         $this->mustHaveColumn($key);
 
-        $data = array_map(function ($el) use ($key) {
+        $getColumn = function ($el) use ($key) {
             return $el[$key];
-        }, $this->data);
+        };
+
+        $data = array_map($getColumn, $this->_data);
 
         foreach ($data as &$row) {
             $row = [$key => $row];
@@ -139,24 +142,28 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     private function offsetSetDataFrame($targetColumn, DataFrame $df)
     {
         if (count($df->columns()) !== 1) {
-            throw new DataFrameException("Can only set a new column from a DataFrame with a single column.");
+            $msg = "Can only set a new column from a DataFrame with a single ";
+            $msg .= "column.";
+            throw new DataFrameException($msg);
         }
 
         if (count($df) != count($this)) {
-            throw new DataFrameException("Source and target DataFrames must have identical number of rows.");
+            $msg = "Source and target DataFrames must have identical number ";
+            $msg .= "of rows.";
+            throw new DataFrameException($msg);
         }
 
         $this->addColumn($targetColumn);
 
         foreach ($this as $i => $row) {
-            $this->data[$i][$targetColumn] = current($df->getIndex($i));
+            $this->_data[$i][$targetColumn] = current($df->getIndex($i));
         }
     }
 
     private function offsetSetClosure($targetColumn, Closure $f)
     {
         foreach ($this as $i => $row) {
-            $this->data[$i][$targetColumn] = $f($row[$targetColumn]);
+            $this->_data[$i][$targetColumn] = $f($row[$targetColumn]);
         }
     }
 
@@ -164,7 +171,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         $this->addColumn($targetColumn);
         foreach ($this as $i => $row) {
-            $this->data[$i][$targetColumn] = $value;
+            $this->_data[$i][$targetColumn] = $value;
         }
     }
 
@@ -173,48 +180,48 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         $this->mustHaveColumn($offset);
 
         foreach ($this as $i => $row) {
-            unset($this->data[$i][$offset]);
+            unset($this->_data[$i][$offset]);
         }
 
-        if (($key = array_search($offset, $this->columns)) !== false) {
-            unset($this->columns[$key]);
+        if (($key = array_search($offset, $this->_columns)) !== false) {
+            unset($this->_columns[$key]);
         }
     }
 
-    /* ****************************************************************************************************************
-     ********************************************* Iterator Implementation ********************************************
-     *****************************************************************************************************************/
+    /* *************************************************************************
+     ************************** Iterator Implementation ************************
+     **************************************************************************/
 
-    private $pointer = 0;
+    private $_pointer = 0;
 
     public function current()
     {
-        return $this->data[$this->key()];
+        return $this->_data[$this->key()];
     }
 
     public function next()
     {
-        $this->pointer++;
+        $this->_pointer++;
     }
 
     public function key()
     {
-        return $this->pointer;
+        return $this->_pointer;
     }
 
     public function valid()
     {
-        return isset($this->data[$this->key()]);
+        return isset($this->_data[$this->key()]);
     }
 
     public function rewind()
     {
-        $this->pointer = 0;
+        $this->_pointer = 0;
     }
 
-    /* ****************************************************************************************************************
-     ********************************************* Countable Implementation *******************************************
-     *****************************************************************************************************************/
+    /* *************************************************************************
+     ************************** Countable Implementation ***********************
+     **************************************************************************/
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
@@ -227,6 +234,6 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     public function count()
     {
-        return count($this->data);
+        return count($this->_data);
     }
 }
