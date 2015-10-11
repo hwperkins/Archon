@@ -1,8 +1,23 @@
-<?php namespace Archon\Exceptions;
+<?php
 
 /**
- * @link https://github.com/HWGehring/Archon for the canonical source repository
- * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ * Contains the DataFrameException.
+ * @package   DataFrame
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ */
+
+namespace Archon\Exceptions;
+
+/**
+ * Generic exception used as the root class for all other exceptions which occur within DataFrame operations.
+ * @package   Archon\Exceptions
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
  */
 class DataFrameException extends \Exception
 {
