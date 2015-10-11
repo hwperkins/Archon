@@ -2,9 +2,11 @@
 
 use Archon\DataFrame;
 
-class FWFDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
+class FWFDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function test_load_fwf_1() {
+    public function testLoadFWF1()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testFWF.fwf';
         /*
 junk
@@ -22,7 +24,7 @@ xyz    opas   78-90-1234 9012
             'col3' => [14, 24],
             'col4' => [25, 29]
         ], ['include' => '/^.{14}\d{2}-\d{2}-\d{4}/']);
-        $test_arr = $df->toArray();
+        $testArr = $df->toArray();
 
         $assertion = [
             [
@@ -45,7 +47,6 @@ xyz    opas   78-90-1234 9012
             ]
         ];
 
-        $this->assertEquals($assertion, $test_arr);
+        $this->assertEquals($assertion, $testArr);
     }
-
 }
