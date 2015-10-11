@@ -6,9 +6,11 @@ use Archon\Exceptions\UnknownOptionException;
  * @link https://github.com/HWGehring/Archon for the canonical source repository
  * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
  */
-class Options {
+class Options
+{
 
-    public static function setDefaultOptions(array $userProvidedOptions, array $defaultOptions) {
+    public static function setDefaultOptions(array $userProvidedOptions, array $defaultOptions)
+    {
         /*
          * First, override all default options with whatever ones have been user-specified.
          */
@@ -35,5 +37,4 @@ class Options {
 
         return $userProvidedOptions;
     }
-
 }
