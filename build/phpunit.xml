@@ -5,7 +5,6 @@
          convertErrorsToExceptions="true"
          convertWarningsToExceptions="true"
          stopOnFailure="false"
-         strict="true"
          verbose="true">
 
  <testsuites>
