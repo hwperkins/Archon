@@ -1,8 +1,9 @@
 <?php namespace Archon;
 
 use Archon\IO\CSV;
+use Archon\IO\HTML;
 
-class DataFrame extends DataFrameCore {
+final class DataFrame extends DataFrameCore {
 
     protected function __construct(array $data) {
         parent::__construct($data);
@@ -18,6 +19,12 @@ class DataFrame extends DataFrameCore {
         $csv = new CSV($fileName);
         $csv->saveFile($this->data, $options);
         return $this;
+    }
+
+    public function toHTML($options = []) {
+        $html = new HTML($this->data);
+        $output = $html->render($options);
+        return $output;
     }
 
     public static function fromArray(array $data, array $options = []) {
