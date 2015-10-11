@@ -17,4 +17,12 @@ class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase {
         $df->toCSV($fileName);
     }
 
+    public function testInvalidOption() {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVOverwrite.csv';
+
+        $this->setExpectedException('Archon\Exceptions\UnknownOptionException');
+        DataFrame::fromCSV($fileName, ['invalid_option' => 0]);
+
+    }
+
 }
