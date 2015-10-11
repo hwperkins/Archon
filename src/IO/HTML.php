@@ -24,51 +24,64 @@ final class HTML
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $readableOpt = $options['readable'];
 
+        if ($readableOpt === true) {
+            throw new NotYetImplementedException('Pretty HTML not yet implemented');
+        }
+
         $columns = current($data);
         $columns = array_keys($columns);
-        $columns = $this->wrapTRTH($columns);
 
-        $header = $this->wrapTHead($columns);
-        $footer = $this->wrapTFoot($columns);
+        $fnTable = $this->fnWrapText('<table>', '</table>');
+        $fnTHead = $this->fnWrapText('<thead>', '</thead>');
+        $fnTFoot = $this->fnWrapText('<tfoot>', '</tfoot>');
+        $fnTBody = $this->fnWrapText('<tbody>', '</tbody>');
+
+        $fnTRTH = $this->fnWrapArray('<tr><th>', '</th><th>', '</th></tr>');
+
+        $columns = $fnTRTH($columns);
 
         foreach ($data as &$row) {
-            $row = $this->wrapTRTH($row);
+            $row = $fnTRTH($row);
         }
 
-        $data = implode('', $data);
-        $data = $this->wrapTBody($data);
-        $data = $header.$footer.$data;
-        $data = $this->wrapTable($data);
+        $data = $fnTable(
+            $fnTHead($columns).
+            $fnTFoot($columns).
+            $fnTBody($data)
+        );
 
-        if ($readableOpt === false) {
-            return $data;
-        }
-
-        throw new NotYetImplementedException('Pretty HTML not yet implemented');
+        return $data;
     }
 
-    private function wrapTRTH(array $data)
+    /**
+     * Returns a function which implodes and wraps an array around the specified HTML tags.
+     * @param $leftTag
+     * @param $implodeTag
+     * @param $rightTag
+     * @return \Closure
+     */
+    private function fnWrapArray($leftTag, $implodeTag, $rightTag)
     {
-        return '<tr><th>'.implode('</th><th>', $data).'</th></tr>';
+        return function (array $data) use ($leftTag, $implodeTag, $rightTag) {
+            $wrap = $this->fnWrapText($leftTag, $rightTag);
+            return $wrap(implode($implodeTag, $data));
+        };
     }
 
-    private function wrapTHead($data)
+    /**
+     * Returns a function which wraps a string or an array around the specified HTML tags.
+     * @param $leftTag
+     * @param $rightTag
+     * @return \Closure
+     */
+    private function fnWrapText($leftTag, $rightTag)
     {
-        return '<thead>'.$data.'</thead>';
-    }
+        return function ($data) use ($leftTag, $rightTag) {
+            if (is_array($data) === true) {
+                $data = implode('', $data);
+            }
 
-    private function wrapTFoot($data)
-    {
-        return '<tfoot>'.$data.'</tfoot>';
-    }
-
-    private function wrapTBody($data)
-    {
-        return '<tbody>'.$data.'</tbody>';
-    }
-
-    private function wrapTable($data)
-    {
-        return '<table>'.$data.'</table>';
+            return $leftTag.$data.$rightTag;
+        };
     }
 }
