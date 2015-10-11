@@ -2,9 +2,11 @@
 
 use Archon\DataFrame;
 
-class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase {
+class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function testOverwriteFailCSV() {
+    public function testOverwriteFailCSV()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVOverwrite.csv';
 
         $df = DataFrame::fromArray([
@@ -17,12 +19,12 @@ class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase {
         $df->toCSV($fileName);
     }
 
-    public function testInvalidOption() {
+    public function testInvalidOption()
+    {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVOverwrite.csv';
 
         $this->setExpectedException('Archon\Exceptions\UnknownOptionException');
         DataFrame::fromCSV($fileName, ['invalid_option' => 0]);
 
     }
-
 }
