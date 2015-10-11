@@ -6,7 +6,8 @@ use RuntimeException;
  * @link https://github.com/HWGehring/Archon for the canonical source repository
  * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
  */
-class CSV {
+class CSV
+{
 
     private $defaultOptions = [
         'sep' => ',',
@@ -20,11 +21,13 @@ class CSV {
         'overwrite' => false
     ];
 
-    public function __construct($fileName) {
+    public function __construct($fileName)
+    {
         $this->fileName = $fileName;
     }
 
-    public function loadFile(array $options = []) {
+    public function loadFile(array $options = [])
+    {
         $fileName = $this->fileName;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
@@ -68,7 +71,7 @@ class CSV {
          * Parses each trimmed line with str_getcsv as an associative array
          * Skips lines which trim to empty string
          */
-        foreach($fileData as $i => $line) {
+        foreach ($fileData as $i => $line) {
             $line = trim($line);
 
             if ($line === '') {
@@ -86,10 +89,11 @@ class CSV {
         return $fileData;
     }
 
-    public function applyColMapToColumns(array $row, array $columns) {
+    public function applyColMapToColumns(array $row, array $columns)
+    {
         $newRow = [];
 
-        foreach($row as $i => &$column) {
+        foreach ($row as $i => &$column) {
             if ($columns[$i] === null) {
                 continue;
             }
@@ -100,7 +104,8 @@ class CSV {
         return $newRow;
     }
 
-    public function saveFile(array $data, array $options = []) {
+    public function saveFile(array $data, array $options = [])
+    {
         $fileName = $this->fileName;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
@@ -112,7 +117,7 @@ class CSV {
             throw new RuntimeException("Write failed. File {$fileName} exists.");
         }
 
-        $quoted = function($elem) use ($quoteOpt) {
+        $quoted = function ($elem) use ($quoteOpt) {
             return $quoteOpt . $elem . $quoteOpt;
         };
 
@@ -123,7 +128,7 @@ class CSV {
         $output = [];
         $output[] = implode($sepOpt, $header);
 
-        foreach($data as $row) {
+        foreach ($data as $row) {
             $row = array_map($quoted, $row);
             $output[] = implode($sepOpt, $row);
         }
