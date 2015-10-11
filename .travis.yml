@@ -6,7 +6,7 @@ php:
   - nightly
 
 before_script:
-  - rm .composer
+  - rm -rf .composer
   - wget http://getcomposer.org/composer.phar
   - php composer.phar install --dev --no-interaction
 
