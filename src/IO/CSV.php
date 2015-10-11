@@ -10,14 +10,10 @@ class CSV {
     const DEFAULT_ESCAPE_CHARACTER = "\\";
     const DEFAULT_COLUMN_FILE_LINE = 0;
 
-    private function __construct() {
+    const DEFAULT_OVERWRITE_FILE = false;
 
-    }
-
-    public static function fromFile($fileName, array $options) {
-        $csv = new CSV();
-        $options = $csv->setDefaultOptions($options);
-        return $csv->loadFile($fileName, $options);
+    public function __construct($fileName) {
+        $this->fileName = $fileName;
     }
 
     private function setDefaultOptions(array &$options) {
@@ -28,10 +24,15 @@ class CSV {
         $options['colmap'] = isset($options['colmap']) ? $options['colmap'] : null;
         $options['quote'] = isset($options['quote']) ? $options['quote'] : self::DEFAULT_QUOTE_STRING;
         $options['escape'] = isset($options['escape']) ? $options['escape'] : self::DEFAULT_ESCAPE_CHARACTER;
+
+        $options['overwrite'] = isset($options['overwrite']) ? $options['overwrite'] : self::DEFAULT_OVERWRITE_FILE;
         return $options;
     }
 
-    private function loadFile($fileName, array $options) {
+    public function loadFile(array $options = []) {
+        $fileName = $this->fileName;
+        $options = $this->setDefaultOptions($options);
+
         $sepOpt = $options['sep'];
         $nlsepOpt = $options['nlsep'];
         $columnsOpt = $options['columns'];
@@ -104,97 +105,37 @@ class CSV {
         return $newRow;
     }
 
-    public static function load_csv($filename, $sep, $nlsep, $columns, $colrow, $mapping, $quote_string, $escape_character) {
-        $pre_csv = trim(file_get_contents($filename));
-        $pre_csv = explode($nlsep, $pre_csv);
+    public function saveFile(array $data, array $options = []) {
+        $fileName = $this->fileName;
+        $options = $this->setDefaultOptions($options);
 
-        $csv = [];
-        foreach($pre_csv as $line) {
-            if (trim($line) !== '') $csv[] = $line;
-        }
-        unset($pre_csv);
+        $overwriteOpt = $options['overwrite'];
+        $sepOpt = $options['sep'];
+        $quoteOpt = $options['quote'];
 
-        foreach($csv as &$line) {
-            $line = str_getcsv($line, $sep, $quote_string, $escape_character);
+        if (file_exists($fileName) and $overwriteOpt !== false) {
+            throw new RuntimeException("Write failed. File {$fileName} exists.");
         }
 
-        $trim_recursive = function($input) use (&$trim_recursive) {
-            if (is_array($input)) {
-                return array_map($trim_recursive, $input);
-            } else {
-                return trim($input);
-            }
+        $quoted = function($el) use ($quoteOpt) {
+            return $quoteOpt . $el . $quoteOpt;
         };
 
-        $file_data = $trim_recursive($csv);
+        $header = current($data);
+        $header = array_keys($header);
+        $header = array_map($quoted, $header);
 
-        if ($columns === NULL) {
-            // Extract columns from $colrow line of file
-            $columns = $file_data[$colrow];
-            unset($file_data[$colrow]);
+        $output = [];
+        $output[] = implode($sepOpt, $header);
+
+        foreach($data as $row) {
+            $row = array_map($quoted, $row);
+            $output[] = implode($sepOpt, $row);
         }
 
-        foreach ($file_data as &$file_line) {
-            if (sizeof($columns) != sizeof($file_line)) {
-                echo print_r($columns) . "</br>";
-                echo print_r($file_line) . "</br>";
-                throw new RuntimeException("Column length does not match exploded length of line.");
-            }
+        $output = implode(PHP_EOL, $output);
 
-            $file_line = array_combine($columns, $file_line);
-        }
+        file_put_contents($fileName, $output);
 
-        // If we specify no custom mapping then the CSV is fully parsed at this moment
-        if ($mapping === NULL) return $file_data;
-
-        if (!is_array($mapping)) throw new RuntimeException("Error: CSV Mapping must be associative array.");
-
-        // Identify columns which we should remove (mapping is associated to null)
-        // and columns which we should rename
-        $columns_to_remove = [];
-        $columns_to_rename = [];
-        foreach($mapping as $key => $value) {
-            if ($value === NULL) {
-                $columns_to_remove[$key] = $value;
-            } else {
-                $columns_to_rename[$key] = $value;
-            }
-        }
-
-        foreach($columns_to_remove as $key => $value) {
-            $col_index = array_search($key, $columns);
-            if ($col_index === FALSE) continue; // Skip mappings that don't exist so we can use mappings as a "catch-all"
-            unset($columns[$col_index]);
-            foreach($file_data as &$file_line) {
-                unset($file_line[$key]);
-            }
-        }
-
-        foreach($columns_to_rename as $key => $value) {
-            $col_index = array_search($key, $columns);
-            if ($col_index === FALSE) continue; // Skip mappings that don't exist so we can use mappings as a "catch-all"
-            $columns[$col_index] = $value;
-        }
-
-        foreach($file_data as &$file_line) {
-            $file_line = array_combine($columns, array_values($file_line));
-        }
-
-        return $file_data;
-    }
-
-    public static function save_csv($filename, array $data, $sep, $overwrite) {
-        if (!file_exists($filename) or $overwrite) {
-            $output = []; // First, implode rows of data on delimiter
-            foreach($data as $row) {
-                $output[] = implode($sep, $row);
-            }
-
-            $output = implode(PHP_EOL, $output); // Then implode on line break
-
-            file_put_contents($filename, $output);
-        } else {
-            throw new RuntimeException("Write failed. File {$filename} exists.");
-        }
     }
 }

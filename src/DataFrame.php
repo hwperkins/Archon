@@ -9,8 +9,15 @@ class DataFrame extends DataFrameCore {
     }
 
     public static function fromCSV($fileName, $options = []) {
-        $data = CSV::fromFile($fileName, $options);
+        $csv = new CSV($fileName);
+        $data = $csv->loadFile($options);
         return new DataFrame($data);
+    }
+
+    public function toCSV($fileName, $options = []) {
+        $csv = new CSV($fileName);
+        $csv->saveFile($this->data, $options);
+        return $this;
     }
 
     public static function fromArray(array $data, array $options = []) {
