@@ -67,8 +67,8 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase {
         $a = $df['a'];
         $b = $df['b'];
 
-        $this->assertEquals([['a' => 1],['a' => 3],['a' => 5]], $a->toArray());
-        $this->assertEquals([['b' => 2],['b' => 4],['b' => 6]], $b->toArray());
+        $this->assertEquals([['a' => 1], ['a' => 3], ['a' => 5]], $a->toArray());
+        $this->assertEquals([['b' => 2], ['b' => 4], ['b' => 6]], $b->toArray());
         $this->assertEquals($input, $df->toArray());
     }
 }
