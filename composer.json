@@ -1,14 +1,19 @@
 {
-  "name": "archon/dataframe",
+  "name": "HWGehring/Archon",
+  "version": "0.0.0",
   "description": "The Archon PHP Data Analysis Library",
-  "license": "proprietary",
+  "keywords": ["data", "data analysis", "sql", "csv", "database", "excel"],
+  "homepage": "https://github.com/HWGehring/Archon",
+  "type": "library",
+  "license": "BSD-3-Clause",
   "require": {
+    "php": ">=5.3",
     "phpoffice/phpexcel": "1.8.0",
     "nategood/httpful": "0.2.19"
   },
   "require-dev": {
     "phpunit/phpunit": "4.7.*",
-    "analog/analog": "dev-master"
+    "satooshi/php-coveralls": "dev-master"
   },
   "autoload": {
     "psr-4": { "Archon\\": "src/" }
