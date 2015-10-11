@@ -78,7 +78,8 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable {
      * @return DataFrame
      */
     public function offsetGet($key) {
-        $data = array_column($this->data, $key);
+        $data = array_map(function($el) use($key) { return $el[$key]; }, $this->data);
+
         foreach($data as &$row) {
             $row = [$key => $row];
         }
