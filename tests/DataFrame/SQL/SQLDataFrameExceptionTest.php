@@ -46,6 +46,15 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
             $bad->toSQL($pdo, 'testTable', ['chunksize' => 1]);
         } catch (PDOException $e) {
             /*
+             * We throw the original exception back here so that we can perform one
+             * more assertion in the finally block.
+             *
+             * If we didn't do this then PHPUnit would terminate as soon as the
+             * expected exception was detected.
+             */
+            throw $e;
+        } finally {
+            /*
              * Now that the exception has been asserted, we make sure the data in
              * the database still matches what we originally committed from the
              * first valid dataframe. This is a perfect use case for the finally
@@ -56,15 +65,6 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($result, $good->toArray());
 
             $pdo->exec("DROP TABLE testTable;");
-
-            /*
-             * We throw the original exception back here so that we can perform one
-             * more assertion in the finally block.
-             *
-             * If we didn't do this then PHPUnit would terminate as soon as the
-             * expected exception was detected.
-             */
-            throw $e;
         }
     }
 }
