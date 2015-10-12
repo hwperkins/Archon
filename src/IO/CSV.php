@@ -53,7 +53,7 @@ class CSV
      *      quote:   The character used to specify literal quoted segments (default: ")
      *      escape:  The character used to escape quotes or other special characters (default: \)
      * @param array $options The option map.
-     * @return array|string  Returns multi-dimensional array of row-column strings.
+     * @return array         Returns multi-dimensional array of row-column strings.
      * @throws \Archon\Exceptions\UnknownOptionException
      */
     public function loadFile(array $options = [])
