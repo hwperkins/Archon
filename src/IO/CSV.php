@@ -1,10 +1,27 @@
-<?php namespace Archon\IO;
-
-use RuntimeException;
+<?php
 
 /**
- * @link https://github.com/HWGehring/Archon for the canonical source repository
- * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ * Contains the CSV class.
+ * @package   DataFrame
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ */
+
+namespace Archon\IO;
+
+use Archon\Exceptions\FileExistsException;
+
+/**
+ * The CSV class contains implementation details for reading and writing files in the CSV format.
+ * Options may be passed to the reading/writing functions which specify line and segment separators, characters to use
+ * as literal quotes, characters to use to escape special characters, etc.
+ * @package   Archon\IO
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
  */
 class CSV
 {
@@ -26,6 +43,21 @@ class CSV
         $this->fileName = $fileName;
     }
 
+    /**
+     * Loads the file which the CSV class was instantiated with.
+     * Options include:
+     *      sep:     The CSV separator (default: ,)
+     *      nlsep:   The new line separator (default: \n)
+     *      columns: Optional column names to use (default: null)
+     *      colline: The line of the CSV file where columns are specified (default: 0)
+     *      colmap:  Optional mapping for renaming columns from what they are in the file to what the user wants them
+     *               to be once loaded into memory (default: null)
+     *      quote:   The character used to specify literal quoted segments (default: ")
+     *      escape:  The character used to escape quotes or other special characters (default: \)
+     * @param array $options The option map.
+     * @return array|string  Returns multi-dimensional array of row-column strings.
+     * @throws \Archon\Exceptions\UnknownOptionException
+     */
     public function loadFile(array $options = [])
     {
         $fileName = $this->fileName;
@@ -81,7 +113,7 @@ class CSV
 
             if ($line !== '') {
                 $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
-                $fileData[$i] = $this->applyColMapToColumns($line, $columns);
+                $fileData[$i] = $this->applyColMapToRowKeys($line, $columns);
             }
         }
 
@@ -89,21 +121,44 @@ class CSV
         return $fileData;
     }
 
-    public function applyColMapToColumns(array $row, array $columns)
+    /**
+     * Will rename the associative array key for a row to its isometric column value. This is done because row elements
+     * initially have no associative array key, but the column array has already been transformed based on user
+     * specification, or the column line of the CSV file.
+     * @param array $row
+     * @param array $columns
+     * @return array
+     */
+    private function applyColMapToRowKeys(array $row, array $columns)
     {
         $newRow = [];
 
-        foreach ($row as $i => &$column) {
+        foreach ($row as $i => $column) {
             if ($columns[$i] === null) {
+                /* Skip colums which are associated to null, because they represent row elements which the user
+                 * does not wish to load from their file.
+                 */
                 continue;
             }
 
+            // Assign the row element an associative key equal to the column it relates to.
             $newRow[$columns[$i]] = $column;
         }
 
         return $newRow;
     }
 
+    /**
+     * Saves the provided two-dimensional array to the file which the CSV class was instantiated with.
+     * Options include:
+     *      sep:       The CSV separator (default: ,)
+     *      quote:     The character used to specify literal quoted segments (default: ")
+     *      overwrite: Boolean option for specifying whether a file which exists should be overwritten (default: false)
+     * @param array $data
+     * @param array $options
+     * @throws FileExistsException
+     * @throws \Archon\Exceptions\UnknownOptionException
+     */
     public function saveFile(array $data, array $options = [])
     {
         $fileName = $this->fileName;
@@ -114,7 +169,7 @@ class CSV
         $quoteOpt = $options['quote'];
 
         if (file_exists($fileName) and $overwriteOpt === false) {
-            throw new RuntimeException("Write failed. File {$fileName} exists.");
+            throw new FileExistsException("Write failed. File {$fileName} exists.");
         }
 
         $quoted = function ($elem) use ($quoteOpt) {
