@@ -31,7 +31,8 @@ final class HTML
         'pretty' => false,
         'class' => null,
         'id' => null,
-        'quote' => "'"
+        'quote' => "'",
+        'datatable' => false
     ];
 
     public function __construct(array $data)
@@ -44,9 +45,9 @@ final class HTML
      * and row element values form the individual cells of the table.
      * Options include:
      *      pretty: Will "prettify" the rendered HTML (default: false)
-     *      class:  Specify the class of the HTML table (default: null)
-     *      id:     Specify the id of the HTML table (default: null)
-     *      quote:  Specify the char to use for quoting table class and/or id (default: ')
+     *      class:  Specify the CSS class of the HTML table (default: null)
+     *      id:     Specify the CSS id of the HTML table (default: null)
+     *      quote:  Specify the character to use for quoting table CSS class and/or CSS id (default: ')
      * @param  array $options
      * @return array
      * @throws NotYetImplementedException
@@ -61,24 +62,22 @@ final class HTML
         $classOpt = $options['class'];
         $idOpt = $options['id'];
         $quoteOpt = $options['quote'];
+        $datatableOpt = $options['datatable'];
 
         $columns = current($data);
         $columns = array_keys($columns);
 
-        $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
-
-        $tableClass = '';
-        if ($classOpt !== null) {
-            $tableClass = " class=".$fnQuoted($classOpt);
+        // Create a uuid HTML id if user wants a datatable but hasn't provided an HTML id
+        if ($datatableOpt === true and $idOpt === null) {
+            $idOpt = '#'.uniqid();
         }
 
-        $tableID = '';
-        if ($idOpt !== null) {
-            $tableID = " id=".$fnQuoted($idOpt);
+        // Prepend hash to HTML id if user failed to include it with their id
+        if ($idOpt !== null and substr($idOpt, 0, 1) !== '#') {
+            $idOpt = '#'.$idOpt;
         }
 
-        $table = '<table'.$tableClass.$tableID.'>';
-
+        $table = $this->assembleOpeningTableTag($classOpt, $idOpt, $quoteOpt);
         $fnTable = $this->fnWrapText($table, '</table>');
         $fnTHead = $this->fnWrapText('<thead>', '</thead>');
         $fnTFoot = $this->fnWrapText('<tfoot>', '</tfoot>');
@@ -98,12 +97,52 @@ final class HTML
             $fnTBody($data)
         );
 
+        if ($datatableOpt === true) {
+            $fnScript = $this->fnWrapText('<script>', '</script>');
+            $fnDocumentReady = $this->fnWrapText('$(document).ready(function() {', '});');
+            $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
+
+            $datatableID = $fnQuoted($idOpt);
+            $jQueryFunction = $fnDocumentReady("$(".$datatableID.").DataTable();");
+            $datatableScript = $fnScript($jQueryFunction);
+
+            $data .= $datatableScript;
+        }
+
         if ($prettyOpt === true) {
             $indenter = new Indenter();
             $data = $indenter->indent($data);
         }
 
         return $data;
+    }
+
+    /**
+     * Assembles the <table> tag with CSS class, CSS id, and/or quote options provided.
+     * @internal
+     * @param  $class
+     * @param  $id
+     * @param  $quote
+     * @return string
+     * @return string
+     * @since  0.1.1
+     */
+    private function assembleOpeningTableTag($class, $id, $quote)
+    {
+
+        $fnQuoted = $this->fnWrapText($quote, $quote);
+
+        if ($class !== null) {
+            $class = " class=".$fnQuoted($class);
+        }
+
+        if ($id !== null) {
+            $id = " id=".$fnQuoted($id);
+        }
+
+        $table = '<table'.$class.$id.'>';
+
+        return $table;
     }
 
     /**
