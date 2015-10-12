@@ -15,8 +15,6 @@ use Archon\Exceptions\FileExistsException;
 
 /**
  * The CSV class contains implementation details for reading and writing files in the CSV format.
- * Options may be passed to the reading/writing functions which specify line and segment separators, characters to use
- * as literal quotes, characters to use to escape special characters, etc.
  * @package   Archon\IO
  * @author    Howard Gehring <hwgehring@gmail.com>
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
