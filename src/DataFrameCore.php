@@ -13,6 +13,7 @@
 namespace Archon;
 
 use Archon\Exceptions\DataFrameException;
+use Archon\Exceptions\InvalidColumnException;
 use Closure;
 use Countable;
 use Iterator;
@@ -43,41 +44,70 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         $this->columns = array_keys(current($data));
     }
 
+    /**
+     * Returns the DataFrame's columns as an array.
+     * @return array
+     * @since  0.1.0
+     */
     public function columns()
     {
         return $this->columns;
     }
 
+    /**
+     * Returns a specific row index of the DataFrame.
+     * @param  $index
+     * @return array
+     * @since  0.1.0
+     */
     public function getIndex($index)
     {
         return $this->data[$index];
     }
 
+    /**
+     * Applies a user-defined function to each row of the DataFrame. The parameters of the function include the row
+     * being iterated over, and optionally the index. ie: apply(function($el, $ix) { ... })
+     * @param  Closure $f
+     * @return DataFrame
+     * @since  0.1.0
+     */
     public function apply(Closure $f)
     {
         if (count($this->columns()) > 1) {
             foreach ($this->data as $i => &$row) {
-                $row = $f($row);
+                $row = $f($row, $i);
             }
         }
 
         if (count($this->columns()) === 1) {
             foreach ($this->data as $i => &$row) {
-                $row[key($row)] = $f($row[key($row)]);
+                $row[key($row)] = $f($row[key($row)], $i);
             }
         }
 
         return $this;
     }
 
+    /**
+     * Assertion that the DataFrame must have the column specified. If not then an exception is thrown.
+     * @param  $columnName
+     * @throws DataFrameException
+     * @since  0.1.0
+     */
     public function mustHaveColumn($columnName)
     {
         if ($this->hasColumn($columnName) === false) {
-            $msg = "Error: {$columnName} doesn't exist in DataFrame.";
-            throw new DataFrameException($msg);
+            throw new InvalidColumnException("{$columnName} doesn't exist in DataFrame");
         }
     }
 
+    /**
+     * Returns a boolean of whether the column specified exists.
+     * @param  $columnName
+     * @return bool
+     * @since  0.1.0
+     */
     public function hasColumn($columnName)
     {
         if (array_search($columnName, $this->columns) === false) {
