@@ -46,18 +46,6 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
             $bad->toSQL($pdo, 'testTable', ['chunksize' => 1]);
         } catch (PDOException $e) {
             /*
-             * Now that the exception has been asserted, we make sure the data in
-             * the database still matches what we originally committed from the
-             * first valid dataframe. This is a perfect use case for the finally
-             * keyword, but it is only supported in PHP 5.5 and later.
-             */
-            $query = $pdo->query("SELECT * FROM testTable;");
-            $result = $query->fetchAll(PDO::FETCH_ASSOC);
-            $this->assertEquals($result, $good->toArray());
-
-            $pdo->exec("DROP TABLE testTable;");
-
-            /*
              * We throw the original exception back here so that we can perform one
              * more assertion in the finally block.
              *
@@ -65,6 +53,17 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
              * expected exception was detected.
              */
             throw $e;
+        } finally {
+            /*
+             * Now that the exception has been asserted, we make sure the data in
+             * the database still matches what we originally committed from the
+             * first valid dataframe.
+             */
+            $query = $pdo->query("SELECT * FROM testTable;");
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            $this->assertEquals($result, $good->toArray());
+
+            $pdo->exec("DROP TABLE testTable;");
         }
     }
 }

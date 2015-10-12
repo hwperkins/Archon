@@ -38,6 +38,17 @@ final class SQL
         $this->pdo = $pdo;
     }
 
+    /**
+     * Performs a SQL insert transaction to provided table, crafting the SQL statement using an array of columns
+     * and a two-dimensional array of data.
+     * @param  $tableName
+     * @param  array $columns
+     * @param  array $data
+     * @param  array $options
+     * @return int
+     * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.2.0
+     */
     public function insertInto($tableName, array $columns, array $data, $options = [])
     {
         $pdo = $this->pdo;
@@ -46,22 +57,37 @@ final class SQL
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $chunksizeOpt = $options['chunksize'];
 
-        $data = array_chunk($data, $chunksizeOpt);
+        // Sanitize table name and columns
+        $tableName = $pdo->quote($tableName);
+        foreach ($columns as &$column) {
+            $column = $pdo->quote($column);
+        }
 
         $pdo->beginTransaction();
         try {
-            $affected = $this->executeInsert($pdo, $tableName, $columns, $data);
+            $data = array_chunk($data, $chunksizeOpt);
+            $affected = $this->insertChunkedData($pdo, $tableName, $columns, $data);
         } catch (PDOException $e) {
             $pdo->rollBack();
             throw $e;
         }
-
         $pdo->commit();
 
         return $affected;
     }
 
-    private function executeInsert(PDO $pdo, $tableName, array $columns, array $data)
+
+    /**
+     * Transforms and executes a series of prepared statements from a chunked array.
+     * @internal
+     * @param  PDO $pdo
+     * @param  $tableName
+     * @param  array $columns
+     * @param  array $data
+     * @return int
+     * @since  0.2.0
+     */
+    private function insertChunkedData(PDO $pdo, $tableName, array $columns, array $data)
     {
         $affected = 0;
         foreach ($data as $chunk) {
@@ -74,6 +100,15 @@ final class SQL
         return $affected;
     }
 
+    /**
+     * Transforms a table string, array of columns, and array of data into a prepared statement.
+     * @internal
+     * @param  $tableName
+     * @param  array $columns
+     * @param  array $data
+     * @return string
+     * @since  0.2.0
+     */
     private function createPreparedStatement($tableName, array $columns, array $data)
     {
         $columns = '('.implode(', ', $columns).')';
@@ -87,6 +122,13 @@ final class SQL
         return sprintf("INSERT INTO %s %s VALUES %s;", $tableName, $columns, $data);
     }
 
+    /**
+     * Flattens a two-dimensional array into a one-dimensional array.
+     * @internal
+     * @param  array $array
+     * @return array
+     * @since  0.2.0
+     */
     private function flattenArray(array $array)
     {
         $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));

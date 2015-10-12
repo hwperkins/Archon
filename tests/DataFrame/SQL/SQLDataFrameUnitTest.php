@@ -15,6 +15,7 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $pdo = new PDO('sqlite::memory:');
+
         $pdo->exec("CREATE TABLE testTable (a TEXT, b TEXT, c TEXT);");
         $df->toSQL($pdo, 'testTable');
         $query = $pdo->query("SELECT * FROM testTable;");
