@@ -32,7 +32,7 @@ final class HTML
         'class' => null,
         'id' => null,
         'quote' => "'",
-        'datatable' => false
+        'datatable' => null
     ];
 
     public function __construct(array $data)
@@ -44,10 +44,11 @@ final class HTML
      * Assembles a two-dimensional array as an HTML table, where row element keys are header/footer columns,
      * and row element values form the individual cells of the table.
      * Options include:
-     *      pretty: Will "prettify" the rendered HTML (default: false)
-     *      class:  Specify the CSS class of the HTML table (default: null)
-     *      id:     Specify the CSS id of the HTML table (default: null)
-     *      quote:  Specify the character to use for quoting table CSS class and/or CSS id (default: ')
+     *      pretty:    Will "prettify" the rendered HTML (default: false)
+     *      class:     Specify the CSS class of the HTML table (default: null)
+     *      id:        Specify the CSS id of the HTML table (default: null)
+     *      quote:     Specify the character to use for quoting table CSS class and/or CSS id (default: ')
+     *      datatable: Options for rendering the table as a DataTable (@see: http://datatables.net) (default: null)
      * @param  array $options
      * @return array
      * @throws NotYetImplementedException
@@ -68,7 +69,7 @@ final class HTML
         $columns = array_keys($columns);
 
         // Create a uuid HTML id if user wants a datatable but hasn't provided an HTML id
-        if ($datatableOpt === true and $idOpt === null) {
+        if ($datatableOpt !== null and $idOpt === null) {
             $idOpt = '#'.uniqid();
         }
 
@@ -97,16 +98,8 @@ final class HTML
             $fnTBody($data)
         );
 
-        if ($datatableOpt === true) {
-            $fnScript = $this->fnWrapText('<script>', '</script>');
-            $fnDocumentReady = $this->fnWrapText('$(document).ready(function() {', '});');
-            $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
-
-            $datatableID = $fnQuoted($idOpt);
-            $jQueryFunction = $fnDocumentReady("$(".$datatableID.").DataTable();");
-            $datatableScript = $fnScript($jQueryFunction);
-
-            $data .= $datatableScript;
+        if ($datatableOpt !== null) {
+            $data .= $this->assembleDataTableScript($datatableOpt, $idOpt, $quoteOpt);
         }
 
         if ($prettyOpt === true) {
@@ -143,6 +136,32 @@ final class HTML
         $table = '<table'.$class.$id.'>';
 
         return $table;
+    }
+
+    /**
+     * Assembles DataTable JavaScript for the rendered HTML table.
+     * @param  $datatableOpt string JSON options for passing into the DataTable. It is the responsibility of the user
+     * to create these strings as I do not wish to impose any particular JSON parser on the result.
+     * @param  $idOpt
+     * @param  $quoteOpt
+     * @return string
+     * @since  0.1.1
+     */
+    private function assembleDataTableScript($datatableOpt, $idOpt, $quoteOpt)
+    {
+        if ($datatableOpt === true) {
+            $datatableOpt = '';
+        }
+
+        $fnScript = $this->fnWrapText('<script>', '</script>');
+        $fnDocumentReady = $this->fnWrapText('$(document).ready(function() {', '});');
+        $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
+
+        $datatableID = $fnQuoted($idOpt);
+        $jQueryFunction = $fnDocumentReady("$(".$datatableID.").DataTable(".$datatableOpt.");");
+        $datatableScript = $fnScript($jQueryFunction);
+
+        return $datatableScript;
     }
 
     /**
