@@ -1,7 +1,6 @@
 <?php namespace Archon\Tests\DataFrame\SQL;
 
 use Archon\DataFrame;
-use Archon\IO\SQL;
 use PDO;
 
 class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
@@ -12,7 +11,7 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $df = DataFrame::fromArray([
             ['a' => 1, 'b' => 2, 'c' => 3],
             ['a' => 4, 'b' => 5, 'c' => 6],
-            ['a' => null, 'b' => 8, 'c' => 9],
+            ['a' => 7, 'b' => 8, 'c' => 9],
         ]);
 
         $pdo = new PDO('sqlite:memory');

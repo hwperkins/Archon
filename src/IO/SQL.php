@@ -24,7 +24,7 @@ use RecursiveIteratorIterator;
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
- * @since     0.1.0
+ * @since     0.2.0
  */
 final class SQL
 {
@@ -55,6 +55,7 @@ final class SQL
             $pdo->rollBack();
             throw $e;
         }
+
         $pdo->commit();
 
         return $affected;
@@ -83,7 +84,7 @@ final class SQL
         }
         $data = implode(', ', $data);
 
-        return 'INSERT INTO '.$tableName.' '.$columns.' VALUES '.$data.';';
+        return sprintf("INSERT INTO %s %s VALUES %s;", $tableName, $columns, $data);
     }
 
     private function flattenArray(array $array)
