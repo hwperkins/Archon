@@ -1,4 +1,16 @@
-<?php namespace Archon;
+<?php
+
+/**
+ * Contains the DataFrameCore class.
+ * @package   DataFrame
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
+ */
+
+namespace Archon;
 
 use Archon\Exceptions\DataFrameException;
 use Closure;
@@ -7,45 +19,50 @@ use Iterator;
 use ArrayAccess;
 
 /**
- * @link https://github.com/HWGehring/Archon for the canonical source repository
- * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ * The DataFrameCore class acts as the implementation for the various data manipulation features of the DataFrame class.
+ * @package   Archon
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
  */
 class DataFrameCore implements ArrayAccess, Iterator, Countable
 {
 
-    /* *************************************************************************
-     *************************** Core Implementation ***************************
-     **************************************************************************/
+    /* *****************************************************************************************************************
+     *********************************************** Core Implementation ***********************************************
+     ******************************************************************************************************************/
 
-    protected $_data = [];
-    protected $_columns = [];
+    protected $data = [];
+    protected $columns = [];
 
     protected function __construct(array $data)
     {
-        $this->_data = $data;
-        $this->_columns = array_keys(current($data));
+        $this->data = $data;
+        $this->columns = array_keys(current($data));
     }
 
     public function columns()
     {
-        return $this->_columns;
+        return $this->columns;
     }
 
     public function getIndex($index)
     {
-        return $this->_data[$index];
+        return $this->data[$index];
     }
 
     public function apply(Closure $f)
     {
         if (count($this->columns()) > 1) {
-            foreach ($this->_data as $i => &$row) {
+            foreach ($this->data as $i => &$row) {
                 $row = $f($row);
             }
         }
 
         if (count($this->columns()) === 1) {
-            foreach ($this->_data as $i => &$row) {
+            foreach ($this->data as $i => &$row) {
                 $row[key($row)] = $f($row[key($row)]);
             }
         }
@@ -63,7 +80,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     public function hasColumn($columnName)
     {
-        if (array_search($columnName, $this->_columns) === false) {
+        if (array_search($columnName, $this->columns) === false) {
             return false;
         } else {
             return true;
@@ -73,7 +90,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     private function addColumn($columnName)
     {
         if (!$this->hasColumn($columnName)) {
-            $this->_columns[] = $columnName;
+            $this->columns[] = $columnName;
         }
     }
 
@@ -82,9 +99,9 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         unset($this[$columnName]);
     }
 
-    /* *************************************************************************
-     ************************ ArrayAccess Implementation ***********************
-     **************************************************************************/
+    /* *****************************************************************************************************************
+     ******************************************* ArrayAccess Implementation ********************************************
+     ******************************************************************************************************************/
 
     /**
      * @param mixed $offset
@@ -118,7 +135,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
             return $el[$key];
         };
 
-        $data = array_map($getColumn, $this->_data);
+        $data = array_map($getColumn, $this->data);
 
         foreach ($data as &$row) {
             $row = [$key => $row];
@@ -156,14 +173,14 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         $this->addColumn($targetColumn);
 
         foreach ($this as $i => $row) {
-            $this->_data[$i][$targetColumn] = current($df->getIndex($i));
+            $this->data[$i][$targetColumn] = current($df->getIndex($i));
         }
     }
 
     private function offsetSetClosure($targetColumn, Closure $f)
     {
         foreach ($this as $i => $row) {
-            $this->_data[$i][$targetColumn] = $f($row[$targetColumn]);
+            $this->data[$i][$targetColumn] = $f($row[$targetColumn]);
         }
     }
 
@@ -171,7 +188,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         $this->addColumn($targetColumn);
         foreach ($this as $i => $row) {
-            $this->_data[$i][$targetColumn] = $value;
+            $this->data[$i][$targetColumn] = $value;
         }
     }
 
@@ -180,48 +197,48 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         $this->mustHaveColumn($offset);
 
         foreach ($this as $i => $row) {
-            unset($this->_data[$i][$offset]);
+            unset($this->data[$i][$offset]);
         }
 
-        if (($key = array_search($offset, $this->_columns)) !== false) {
-            unset($this->_columns[$key]);
+        if (($key = array_search($offset, $this->columns)) !== false) {
+            unset($this->columns[$key]);
         }
     }
 
-    /* *************************************************************************
-     ************************** Iterator Implementation ************************
-     **************************************************************************/
+    /* *****************************************************************************************************************
+     ********************************************* Iterator Implementation *********************************************
+     ******************************************************************************************************************/
 
-    private $_pointer = 0;
+    private $pointer = 0;
 
     public function current()
     {
-        return $this->_data[$this->key()];
+        return $this->data[$this->key()];
     }
 
     public function next()
     {
-        $this->_pointer++;
+        $this->pointer++;
     }
 
     public function key()
     {
-        return $this->_pointer;
+        return $this->pointer;
     }
 
     public function valid()
     {
-        return isset($this->_data[$this->key()]);
+        return isset($this->data[$this->key()]);
     }
 
     public function rewind()
     {
-        $this->_pointer = 0;
+        $this->pointer = 0;
     }
 
-    /* *************************************************************************
-     ************************** Countable Implementation ***********************
-     **************************************************************************/
+    /* *****************************************************************************************************************
+     ******************************************** Countable Implementation *********************************************
+     ******************************************************************************************************************/
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
@@ -234,6 +251,6 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     public function count()
     {
-        return count($this->_data);
+        return count($this->data);
     }
 }
