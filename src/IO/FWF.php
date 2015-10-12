@@ -1,8 +1,23 @@
-<?php namespace Archon\IO;
+<?php
 
 /**
- * @link https://github.com/HWGehring/Archon for the canonical source repository
- * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ * Contains the FWF class.
+ * @package   DataFrame
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ */
+
+namespace Archon\IO;
+
+/**
+ * The FWF class contains implementation details for reading and writing files in the fixed-width format.
+ * @package   Archon\IO
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
  */
 class FWF
 {
@@ -17,6 +32,16 @@ class FWF
         $this->fileName = $fileName;
     }
 
+    /**
+     * Loads the file which the FWF class was instantiated with.
+     * Options include:
+     *      include: Whitelist regex to apply to each line of the file (default: null)
+     *      exclude: Blacklist regex to apply to each line of the file (default: null)
+     * @param array $colSpecs Associative array mapping column names to start-end column positions.
+     * @param array $options
+     * @return array
+     * @throws \Archon\Exceptions\UnknownOptionException
+     */
     public function loadFile(array $colSpecs, array $options = [])
     {
         $fileName = $this->fileName;
@@ -42,6 +67,12 @@ class FWF
         return $fileData;
     }
 
+    /**
+     * Parses a string of data based on the rules defined in user provided colspecs.
+     * @param $data
+     * @param array $colSpecs
+     * @return array
+     */
     private function applyColSpecs($data, array $colSpecs)
     {
         $result = [];
