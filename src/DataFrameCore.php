@@ -92,7 +92,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Assertion that the DataFrame must have the column specified. If not then an exception is thrown.
      * @param  $columnName
-     * @throws DataFrameException
+     * @throws InvalidColumnException
      * @since  0.1.0
      */
     public function mustHaveColumn($columnName)
@@ -103,7 +103,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Returns a boolean of whether the column specified exists.
+     * Returns a boolean of whether the specified column exists.
      * @param  $columnName
      * @return bool
      * @since  0.1.0
@@ -117,6 +117,12 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+    /**
+     * Adds a new column to the DataFrame.
+     * @internal
+     * @param $columnName
+     * @since 0.1.0
+     */
     private function addColumn($columnName)
     {
         if (!$this->hasColumn($columnName)) {
@@ -124,6 +130,11 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+    /**
+     * Removes a column (and all associated data) from the DataFrame.
+     * @param $columnName
+     * @since 0.1.0
+     */
     public function removeColumn($columnName)
     {
         unset($this[$columnName]);
@@ -134,13 +145,16 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
      ******************************************************************************************************************/
 
     /**
-     * @param mixed $offset
+     * Provides isset($df['column']) functionality.
+     * @internal
+     * @param  mixed $columnName
      * @return bool
+     * @since  0.1.0
      */
-    public function offsetExists($offset)
+    public function offsetExists($columnName)
     {
         foreach ($this as $row) {
-            if (!array_key_exists($offset, $row)) {
+            if (!array_key_exists($columnName, $row)) {
                 return false;
             }
         }
@@ -151,29 +165,44 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Allows user retrieve DataFrame subsets from a two-dimensional array by
      * simply requesting an element of the instantiated DataFrame.
-     *
-     * ie: $foo_df = $df['foo'];
-     *
-     * @param mixed $key
+     *      ie: $fooDF = $df['foo'];
+     * @internal
+     * @param  mixed $columnName
      * @return DataFrame
+     * @throws InvalidColumnException
+     * @since  0.1.0
      */
-    public function offsetGet($key)
+    public function offsetGet($columnName)
     {
-        $this->mustHaveColumn($key);
+        $this->mustHaveColumn($columnName);
 
-        $getColumn = function ($el) use ($key) {
-            return $el[$key];
+        $getColumn = function ($el) use ($columnName) {
+            return $el[$columnName];
         };
 
         $data = array_map($getColumn, $this->data);
 
         foreach ($data as &$row) {
-            $row = [$key => $row];
+            $row = [$columnName => $row];
         }
 
         return new DataFrame($data);
     }
 
+    /**
+     * Allows user set DataFrame columns from a Closure, value, or another single-column DataFrame.
+     *      ie:
+     *          $df[$targetColumn] = $rightHandSide
+     *          $df['bar'] = $df['foo'];
+     *          $df['bar'] = $df->foo;
+     *          $df['foo'] = function ($foo) { return $foo + 1; };
+     *          $df['foo'] = 'bar';
+     * @internal
+     * @param  mixed $targetColumn
+     * @param  mixed $rightHandSide
+     * @throws DataFrameException
+     * @since  0.1.0
+     */
     public function offsetSet($targetColumn, $rightHandSide)
     {
         if ($rightHandSide instanceof DataFrame) {
@@ -185,7 +214,16 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
-
+    /**
+     * Allows user set DataFrame columns from a single-column DataFrame.
+     *      ie:
+     *          $df['bar'] = $df['foo'];
+     * @internal
+     * @param  $targetColumn
+     * @param  DataFrame $df
+     * @throws DataFrameException
+     * @since  0.1.0
+     */
     private function offsetSetDataFrame($targetColumn, DataFrame $df)
     {
         if (count($df->columns()) !== 1) {
@@ -207,6 +245,15 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+    /**
+     * Allows user set DataFrame columns from a Closure.
+     *      ie:
+     *          $df['foo'] = function ($foo) { return $foo + 1; };
+     * @internal
+     * @param $targetColumn
+     * @param Closure $f
+     * @since 0.1.0
+     */
     private function offsetSetClosure($targetColumn, Closure $f)
     {
         foreach ($this as $i => $row) {
@@ -214,6 +261,15 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+    /**
+     * Allows user set DataFrame columns from a variable.
+     *      ie:
+     *          $df['foo'] = 'bar';
+     * @internal
+     * @param $targetColumn
+     * @param $value
+     * @since 0.1.0
+     */
     private function offsetSetValue($targetColumn, $value)
     {
         $this->addColumn($targetColumn);
@@ -222,6 +278,13 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+    /**
+     * Allows user to remove columns from the DataFrame using unset.
+     *      ie: unset($df['column'])
+     * @param  mixed $offset
+     * @throws InvalidColumnException
+     * @since  0.1.0
+     */
     public function offsetUnset($offset)
     {
         $this->mustHaveColumn($offset);
@@ -241,26 +304,57 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     private $pointer = 0;
 
+    /**
+     * Return the current element
+     * @link   http://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @since  0.1.0
+     */
     public function current()
     {
         return $this->data[$this->key()];
     }
 
+    /**
+     * Move forward to next element
+     * @link   http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     * @since  0.1.0
+     */
     public function next()
     {
         $this->pointer++;
     }
 
+    /**
+     * Return the key of the current element
+     * @link   http://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     * @since  0.1.0
+     */
     public function key()
     {
         return $this->pointer;
     }
 
+    /**
+     * Checks if current position is valid
+     * @link   http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     *                 Returns true on success or false on failure.
+     * @since  0.1.0
+     */
     public function valid()
     {
         return isset($this->data[$this->key()]);
     }
 
+    /**
+     * Rewind the Iterator to the first element
+     * @link   http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     * @since  0.1.0
+     */
     public function rewind()
     {
         $this->pointer = 0;
@@ -271,13 +365,11 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
      ******************************************************************************************************************/
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
      * Count elements of an object
-     * @link http://php.net/manual/en/countable.count.php
+     * @link   http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
-     * </p>
-     * <p>
-     * The return value is cast to an integer.
+     *             The return value is cast to an integer.
+     * @since  0.1.0
      */
     public function count()
     {
