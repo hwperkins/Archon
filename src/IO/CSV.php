@@ -15,8 +15,6 @@ use Archon\Exceptions\FileExistsException;
 
 /**
  * The CSV class contains implementation details for reading and writing files in the CSV format.
- * Options may be passed to the reading/writing functions which specify line and segment separators, characters to use
- * as literal quotes, characters to use to escape special characters, etc.
  * @package   Archon\IO
  * @author    Howard Gehring <hwgehring@gmail.com>
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
@@ -55,7 +53,7 @@ class CSV
      *      quote:   The character used to specify literal quoted segments (default: ")
      *      escape:  The character used to escape quotes or other special characters (default: \)
      * @param array $options The option map.
-     * @return array|string  Returns multi-dimensional array of row-column strings.
+     * @return array         Returns multi-dimensional array of row-column strings.
      * @throws \Archon\Exceptions\UnknownOptionException
      */
     public function loadFile(array $options = [])

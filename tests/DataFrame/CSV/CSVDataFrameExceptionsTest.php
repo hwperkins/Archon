@@ -15,7 +15,7 @@ class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
             ['a' => 7, 'b' => 8, 'c' => 9],
         ]);
 
-        $this->setExpectedException('RuntimeException');
+        $this->setExpectedException('Archon\Exceptions\FileExistsException');
         $df->toCSV($fileName);
     }
 
