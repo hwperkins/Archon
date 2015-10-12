@@ -1,6 +1,5 @@
 {
   "name": "archon/dataframe",
-  "version": "0.1.0",
   "description": "Archon: PHP Data Analysis Library",
   "keywords": ["data", "data analysis", "sql", "csv", "database", "excel"],
   "homepage": "https://github.com/HWGehring/Archon",
