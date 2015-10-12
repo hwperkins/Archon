@@ -42,6 +42,11 @@ final class HTML
     /**
      * Assembles a two-dimensional array as an HTML table, where row element keys are header/footer columns,
      * and row element values form the individual cells of the table.
+     * Options include:
+     *      pretty: Will "prettify" the rendered HTML (default: false)
+     *      class:  Specify the class of the HTML table (default: null)
+     *      id:     Specify the id of the HTML table (default: null)
+     *      quote:  Specify the char to use for quoting table class and/or id (default: ')
      * @param  array $options
      * @return array
      * @throws NotYetImplementedException
