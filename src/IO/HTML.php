@@ -13,6 +13,7 @@
 namespace Archon\IO;
 
 use Archon\Exceptions\NotYetImplementedException;
+use Gajus\Dindent\Indenter;
 
 /**
  * The HTML class contains implementation details for transforming two-dimensional arrays into HTML tables.
@@ -27,7 +28,7 @@ final class HTML
 {
 
     private $defaultOptions = [
-        'readable' => false
+        'pretty' => false
     ];
 
     public function __construct(array $data)
@@ -48,11 +49,7 @@ final class HTML
     {
         $data = $this->data;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
-        $readableOpt = $options['readable'];
-
-        if ($readableOpt === true) {
-            throw new NotYetImplementedException('Pretty HTML not yet implemented');
-        }
+        $prettyOpt = $options['pretty'];
 
         $columns = current($data);
         $columns = array_keys($columns);
@@ -75,6 +72,11 @@ final class HTML
             $fnTFoot($columns).
             $fnTBody($data)
         );
+
+        if ($prettyOpt === true) {
+            $indenter = new Indenter();
+            $data = $indenter->indent($data);
+        }
 
         return $data;
     }
