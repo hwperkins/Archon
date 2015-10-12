@@ -40,7 +40,7 @@ final class DataFrame extends DataFrameCore
     public function toHTML($options = [])
     {
         $html = new HTML($this->_data);
-        $output = $html->renderTable($options);
+        $output = $html->assembleTable($options);
         return $output;
     }
 

@@ -1,10 +1,25 @@
-<?php namespace Archon\IO;
+<?php
+
+/**
+ * Contains the HTML class.
+ * @package   DataFrame
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
+ */
+
+namespace Archon\IO;
 
 use Archon\Exceptions\NotYetImplementedException;
 
 /**
- * @link https://github.com/HWGehring/Archon for the canonical source repository
- * @license https://github.com/HWGehring/Archon/blob/master/LICENSE BSD 3-Clause
+ * The HTML class contains implementation details for transforming two-dimensional arrays into HTML tables.
+ * @package   Archon\IO
+ * @author    Howard Gehring <hwgehring@gmail.com>
+ * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
+ * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
+ * @link      https://github.com/HWGehring/Archon
  */
 final class HTML
 {
@@ -18,7 +33,15 @@ final class HTML
         $this->data = $data;
     }
 
-    public function renderTable(array $options)
+    /**
+     * Assembles a two-dimensional array as an HTML table, where row element keys are header/footer columns,
+     * and row element values form the individual cells of the table.
+     * @param array $options
+     * @return array
+     * @throws NotYetImplementedException
+     * @throws \Archon\Exceptions\UnknownOptionException
+     */
+    public function assembleTable(array $options)
     {
         $data = $this->data;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
