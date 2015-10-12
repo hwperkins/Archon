@@ -5,4 +5,22 @@
 [![Latest Stable Version](https://poser.pugx.org/archon/dataframe/v/stable)](https://packagist.org/packages/archon/dataframe)
 [![License](https://poser.pugx.org/archon/dataframe/license)](https://packagist.org/packages/archon/dataframe)
 
-Under construction.
+Archon is a PHP library which is designed to make working tabular/relational data, files, and databases easy.
+
+The project is currently developmental, there is still a lot of work which needs to be done, but progress is steady and the road ahead is clear.
+
+## Installation
+
+Using Composer:
+
+```sh
+composer require archon/dataframe
+```
+
+```json
+{
+    "require": {
+        "archon/dataframe": "0.1.*"
+    }
+}
+```
