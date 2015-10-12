@@ -7,8 +7,6 @@
 
 Archon is a PHP library which is designed to make working tabular/relational data, files, and databases easy.
 
-The project is currently developmental, there is still a lot of work which needs to be done, but progress is steady and the road ahead is clear.
-
 ## Installation
 
 Using Composer:
@@ -20,7 +18,7 @@ composer require archon/dataframe
 ```json
 {
     "require": {
-        "archon/dataframe": "0.1.*"
+        "archon/dataframe": "0.2.*"
     }
 }
 ```

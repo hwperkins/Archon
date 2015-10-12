@@ -18,8 +18,7 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
 
         $pdo->exec("CREATE TABLE testTable (a TEXT, b TEXT, c TEXT);");
         $df->toSQL($pdo, 'testTable');
-        $query = $pdo->query("SELECT * FROM testTable;");
-        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        $result = $pdo->query("SELECT * FROM testTable;")->fetchAll(PDO::FETCH_ASSOC);
         $this->assertEquals($result, $df->toArray());
         $pdo->exec("DROP TABLE testTable;");
     }
