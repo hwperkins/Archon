@@ -14,12 +14,12 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
             ['a' => 7, 'b' => 8, 'c' => 9],
         ]);
 
-        $pdo = new PDO('sqlite:memory');
-        $pdo->exec("DROP TABLE IF EXISTS testTable;");
-        $pdo->exec("CREATE TABLE testTable (a TEXT NOT NULL, b TEXT, c TEXT);");
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec("CREATE TABLE testTable (a TEXT, b TEXT, c TEXT);");
         $df->toSQL($pdo, 'testTable');
         $query = $pdo->query("SELECT * FROM testTable;");
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
         $this->assertEquals($result, $df->toArray());
+        $pdo->exec("DROP TABLE testTable;");
     }
 }

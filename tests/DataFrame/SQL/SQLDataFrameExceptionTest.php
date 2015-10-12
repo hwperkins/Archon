@@ -11,9 +11,8 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
     {
         // This test is tricky. We want to assert that a failed commit will roll back the database.
 
-        $pdo = new PDO('sqlite:memory');
+        $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->exec("DROP TABLE IF EXISTS testTable;");
         $pdo->exec("CREATE TABLE testTable (a TEXT NOT NULL, b TEXT, c TEXT);");
 
         // The NOT NULL constraint on column a is what we'll be using to trigger a rollback.
