@@ -57,8 +57,7 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
             /*
              * Now that the exception has been asserted, we make sure the data in
              * the database still matches what we originally committed from the
-             * first valid dataframe. This is a perfect use case for the finally
-             * keyword, but it is only supported in PHP 5.5 and later.
+             * first valid dataframe.
              */
             $query = $pdo->query("SELECT * FROM testTable;");
             $result = $query->fetchAll(PDO::FETCH_ASSOC);
