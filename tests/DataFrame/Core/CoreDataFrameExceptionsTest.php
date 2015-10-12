@@ -18,7 +18,7 @@ class CoreDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidColumn()
     {
-        $this->setExpectedException('Archon\Exceptions\DataFrameException');
+        $this->setExpectedException('Archon\Exceptions\InvalidColumnException');
         $this->df['foo'];
     }
 

@@ -7,6 +7,7 @@
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
  */
 
 namespace Archon\IO;
@@ -18,8 +19,9 @@ namespace Archon\IO;
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
  */
-class FWF
+final class FWF
 {
 
     private $defaultOptions = [
@@ -37,10 +39,11 @@ class FWF
      * Options include:
      *      include: Whitelist regex to apply to each line of the file (default: null)
      *      exclude: Blacklist regex to apply to each line of the file (default: null)
-     * @param array $colSpecs Associative array mapping column names to start-end column positions.
-     * @param array $options
+     * @param  array $colSpecs Associative array mapping column names to start-end column positions.
+     * @param  array $options
      * @return array
      * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.1.0
      */
     public function loadFile(array $colSpecs, array $options = [])
     {
@@ -69,9 +72,10 @@ class FWF
 
     /**
      * Parses a string of data based on the rules defined in user provided colspecs.
-     * @param $data
-     * @param array $colSpecs
+     * @param  $data
+     * @param  array $colSpecs
      * @return array
+     * @since  0.1.0
      */
     private function applyColSpecs($data, array $colSpecs)
     {
