@@ -28,7 +28,10 @@ final class HTML
 {
 
     private $defaultOptions = [
-        'pretty' => false
+        'pretty' => false,
+        'class' => null,
+        'id' => null,
+        'quote' => "'"
     ];
 
     public function __construct(array $data)
@@ -50,11 +53,28 @@ final class HTML
         $data = $this->data;
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $prettyOpt = $options['pretty'];
+        $classOpt = $options['class'];
+        $idOpt = $options['id'];
+        $quoteOpt = $options['quote'];
 
         $columns = current($data);
         $columns = array_keys($columns);
 
-        $fnTable = $this->fnWrapText('<table>', '</table>');
+        $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
+
+        $tableClass = '';
+        if ($classOpt !== null) {
+            $tableClass = " class=".$fnQuoted($classOpt);
+        }
+
+        $tableID = '';
+        if ($idOpt !== null) {
+            $tableID = " id=".$fnQuoted($idOpt);
+        }
+
+        $table = '<table'.$tableClass.$tableID.'>';
+
+        $fnTable = $this->fnWrapText($table, '</table>');
         $fnTHead = $this->fnWrapText('<thead>', '</thead>');
         $fnTFoot = $this->fnWrapText('<tfoot>', '</tfoot>');
         $fnTBody = $this->fnWrapText('<tbody>', '</tbody>');

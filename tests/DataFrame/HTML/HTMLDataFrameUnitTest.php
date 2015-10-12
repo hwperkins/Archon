@@ -70,4 +70,48 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $df->toHTML(['pretty' => true]));
     }
+
+    public function testClassIDOptions()
+    {
+        $df = DataFrame::fromArray([
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+        ]);
+
+        $fnExpected = function ($tableString) {
+            return $tableString."<thead><tr><th>a</th><th>b</th><th>c</th></tr></thead>"
+                ."<tfoot><tr><th>a</th><th>b</th><th>c</th></tr></tfoot>"
+                ."<tbody>"
+                ."<tr><th>1</th><th>2</th><th>3</th></tr>"
+                ."<tr><th>4</th><th>5</th><th>6</th></tr>"
+                ."<tr><th>7</th><th>8</th><th>9</th></tr>"
+                ."</tbody>"
+                ."</table>";
+        };
+
+        $expected = $fnExpected("<table class='classname'>");
+        $this->assertEquals($expected, $df->toHTML([
+            'class' => 'classname'
+        ]));
+
+        $expected = $fnExpected("<table id='idname'>");
+        $this->assertEquals($expected, $df->toHTML([
+            'id' => 'idname'
+        ]));
+
+        $expected = $fnExpected("<table class='classname' id='idname'>");
+        $this->assertEquals($expected, $df->toHTML([
+            'class' => 'classname',
+            'id' => 'idname'
+        ]));
+
+        $expected = $fnExpected('<table class="classname" id="idname">');
+        $this->assertEquals($expected, $df->toHTML([
+            'class' => 'classname',
+            'id' => 'idname',
+            'quote' => '"'
+        ]));
+
+    }
 }
