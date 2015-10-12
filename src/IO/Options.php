@@ -22,14 +22,14 @@ use Archon\Exceptions\UnknownOptionException;
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
  */
-class Options
+final class Options
 {
 
 
     /**
      * Will apply all default options to an associative array of user-provided options.
-     * @param array $userOptions    User-provided options.
-     * @param array $defaultOptions Class-provided options.
+     * @param  array $userOptions    User-provided options.
+     * @param  array $defaultOptions Class-provided options.
      * @return array
      * @throws UnknownOptionException Exception when an option is unknown.
      */

@@ -7,6 +7,7 @@
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
  */
 
 namespace Archon\IO;
@@ -15,15 +16,14 @@ use Archon\Exceptions\FileExistsException;
 
 /**
  * The CSV class contains implementation details for reading and writing files in the CSV format.
- * Options may be passed to the reading/writing functions which specify line and segment separators, characters to use
- * as literal quotes, characters to use to escape special characters, etc.
  * @package   Archon\IO
  * @author    Howard Gehring <hwgehring@gmail.com>
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
+ * @since     0.1.0
  */
-class CSV
+final class CSV
 {
 
     private $defaultOptions = [
@@ -54,9 +54,10 @@ class CSV
      *               to be once loaded into memory (default: null)
      *      quote:   The character used to specify literal quoted segments (default: ")
      *      escape:  The character used to escape quotes or other special characters (default: \)
-     * @param array $options The option map.
-     * @return array|string  Returns multi-dimensional array of row-column strings.
+     * @param  array $options The option map.
+     * @return array         Returns multi-dimensional array of row-column strings.
      * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.1.0
      */
     public function loadFile(array $options = [])
     {
@@ -125,9 +126,10 @@ class CSV
      * Will rename the associative array key for a row to its isometric column value. This is done because row elements
      * initially have no associative array key, but the column array has already been transformed based on user
      * specification, or the column line of the CSV file.
-     * @param array $row
-     * @param array $columns
+     * @param  array $row
+     * @param  array $columns
      * @return array
+     * @since  0.1.0
      */
     private function applyColMapToRowKeys(array $row, array $columns)
     {
@@ -154,10 +156,11 @@ class CSV
      *      sep:       The CSV separator (default: ,)
      *      quote:     The character used to specify literal quoted segments (default: ")
      *      overwrite: Boolean option for specifying whether a file which exists should be overwritten (default: false)
-     * @param array $data
-     * @param array $options
+     * @param  array $data
+     * @param  array $options
      * @throws FileExistsException
      * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.1.0
      */
     public function saveFile(array $data, array $options = [])
     {

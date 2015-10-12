@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Contains the DataFrameException.
+ * Contains the InvalidColumnException.
  * @package   DataFrame
  * @author    Howard Gehring <hwgehring@gmail.com>
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
@@ -13,7 +13,7 @@
 namespace Archon\Exceptions;
 
 /**
- * Generic exception used as the root class for all other exceptions which occur within DataFrame operations.
+ * Exception thrown when an operation is attempted on a column which doesn't exist.
  * @package   Archon\Exceptions
  * @author    Howard Gehring <hwgehring@gmail.com>
  * @copyright 2015 Howard Gehring <hwgehring@gmail.com>
@@ -21,7 +21,7 @@ namespace Archon\Exceptions;
  * @link      https://github.com/HWGehring/Archon
  * @since     0.1.0
  */
-class DataFrameException extends \Exception
+class InvalidColumnException extends DataFrameException
 {
 
 }
