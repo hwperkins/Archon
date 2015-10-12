@@ -12,8 +12,10 @@
 
 namespace Archon\IO;
 
-use Archon\DataFrame;
 use PDO;
+use PDOException;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 /**
  * The SQL class contains implementation details for reading and writing data to and from relational databases.
@@ -27,57 +29,72 @@ use PDO;
 final class SQL
 {
 
-    public function __construct(DataFrame $df, PDO $pdo)
+    private $defaultOptions = [
+        'chunksize' => 5000
+    ];
+
+    public function __construct(PDO $pdo)
     {
-        $this->columns = $df->columns();
-        $this->data = $df->toArray();
         $this->pdo = $pdo;
     }
 
-    public function prepareInsert($tableName, $chunkSize = 5000)
+    public function insertInto($tableName, array $columns, array $data, $options = [])
     {
-        $data = $this->data;
-        $data = array_chunk($data, $chunkSize);
+        $pdo = $this->pdo;
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $chunks = [];
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
+        $chunksizeOpt = $options['chunksize'];
+
+        $data = array_chunk($data, $chunksizeOpt);
+
+        $pdo->beginTransaction();
+        try {
+            $affected = $this->executeInsert($pdo, $tableName, $columns, $data);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+        $pdo->commit();
+
+        return $affected;
+    }
+
+    private function executeInsert(PDO $pdo, $tableName, array $columns, array $data)
+    {
+        $affected = 0;
         foreach ($data as $chunk) {
-            $chunks[] = $this->assembleInsert($tableName, $this->columns, $chunk);
+            $sql = $this->createPreparedStatement($tableName, $columns, $chunk);
+            $stmt = $pdo->prepare($sql);
+            $chunk = $this->flattenArray($chunk);
+            $stmt->execute($chunk);
         }
 
-        if (count($chunks) === 1) {
-            $chunks = current($chunks);
-        }
-
-        return $chunks;
+        return $affected;
     }
 
-    public function assembleInsert($tableName, $columns, $data)
+    private function createPreparedStatement($tableName, array $columns, array $data)
     {
-        $parenthesis = $this->fnWrapArray('(', ', ', ')');
-        $values = array_map($parenthesis, $data);
-        $values = implode(', ', $values);
-        $columns = $parenthesis($columns);
+        $columns = '('.implode(', ', $columns).')';
 
-        $result = sprintf("INSERT INTO %s %s VALUES %s;", $tableName, $columns, $values);
+        foreach ($data as &$row) {
+            $row = array_fill(0, count($row), '?');
+            $row = '('.implode(', ', $row).')';
+        }
+        $data = implode(', ', $data);
+
+        return 'INSERT INTO '.$tableName.' '.$columns.' VALUES '.$data.';';
+    }
+
+    private function flattenArray(array $array)
+    {
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
+
+        $result = [];
+        foreach ($it as $element) {
+            $result[] = $element;
+        }
+
         return $result;
-    }
-
-    private function fnWrapArray($left, $intersperse, $right)
-    {
-        return function (array $data) use ($left, $intersperse, $right) {
-            $wrap = $this->fnWrapText($left, $right);
-            return $wrap(implode($intersperse, $data));
-        };
-    }
-
-    private function fnWrapText($left, $right)
-    {
-        return function ($data) use ($left, $right) {
-            if (is_array($data) === true) {
-                $data = implode('', $data);
-            }
-
-            return $left.$data.$right;
-        };
     }
 }

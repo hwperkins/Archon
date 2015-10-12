@@ -15,6 +15,8 @@ namespace Archon;
 use Archon\IO\CSV;
 use Archon\IO\FWF;
 use Archon\IO\HTML;
+use Archon\IO\SQL;
+use PDO;
 
 /**
  * The DataFrame class acts as an interface to various underlying data structure, file format, and database
@@ -78,6 +80,11 @@ final class DataFrame extends DataFrameCore
         return new DataFrame($data);
     }
 
+    public function toSQL(PDO $pdo, $tableName, array $options = [])
+    {
+        $sql = new SQL($pdo);
+        $sql->insertInto($tableName, $this->columns, $this->data, $options);
+    }
     /**
      * Outputs a DataFrame to an HTML string.
      * @param  array $options
