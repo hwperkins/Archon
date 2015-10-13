@@ -5,7 +5,7 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/archon/dataframe.svg?style=flat-square)](https://packagist.org/packages/archon/dataframe)
 [![License](https://img.shields.io/packagist/l/archon/dataframe.svg?style=flat-square)](https://packagist.org/packages/archon/dataframe)
 
-Archon is a PHP library which is designed to make working tabular/relational data, files, and databases easy.
+Archon is a PHP library which is designed to make working tabular/relational data, files, and databases easy. The core component of the library is the DataFrame class -- a tabular data structure 
 
 ## Installation
 
@@ -23,7 +23,17 @@ composer require archon/dataframe
 }
 ```
 
-## Examples
+## Data Format Examples
+
+### Instantiating from an array:
+
+```php
+$df = DataFrame::fromArray([
+    ['a' => 1, 'b' => 2, 'c' => 3],
+    ['a' => 4, 'b' => 5, 'c' => 6],
+    ['a' => 7, 'b' => 8, 'c' => 9],
+]);
+```
 
 ### Reading a CSV file:
 
@@ -64,6 +74,14 @@ $df = DataFrame::fromFWF($fileName, [
 
 ```
 
+### Committing to a database:
+
+```php
+$pdo = new PDO('sqlite::memory:');
+$affected = $df->toSQL($pdo, 'table_name');
+echo sprintf('%d rows committed to database.', $affected);
+```
+
 ### Displaying an HTML table:
 
 ```php
@@ -80,7 +98,7 @@ $html = $df->toHTML(['class' => 'myclass', 'id' => 'myid']);
 </tbody>
 </table>
 
-with support for [DataTables.js](http://datatables.net/):
+With support for [DataTables.js](http://datatables.net/):
 
 ```php
 $dataTable = $df->toHTML(['datatable' => '{ "optionKey": "optionValue" }']);
@@ -121,7 +139,7 @@ Array
 )
 ```
 
-### Basic operations:
+## Basic operations:
 
 Getting column names:
 ```php
@@ -135,6 +153,20 @@ Array
 )
 ```
 
+Adding columns:
+```php
+$df['key'] = 'value';
+```
+
+Removing columns:
+```php
+unset($df['key']);
+```
+
+Counting rows:
+```php
+count($df);
+```
 Iterating over rows:
 ```php
 foreach ($df as $i => $row) {
@@ -147,7 +179,7 @@ foreach ($df as $i => $row) {
 ```
 Applying functions to rows:
 ```php
-$df = $df->apply(function ($row) {
+$df = $df->apply(function ($row, $index) {
     $row['a'] = $row['c'] + 1;
     return $row;
 });
@@ -155,64 +187,14 @@ $df = $df->apply(function ($row) {
 
 Applying functions to columns directly:
 ```php
-$df['a'] = function ($el) {
+$df['a'] = function ($el, $key) {
     return $el + 3;
 };
 ```
+
+Applying functions to columns via proxy of other columns:
 ```php
-$df['a'] = $df['c']->apply(function ($el) {
+$df['a'] = $df['c']->apply(function ($el, $key) {
     return $el + 1;
 });
-```
-
-```php
---------------------------
-Array
-(
-    [0] => Array
-        (
-            [a] => 4
-            [b] => 2
-            [c] => 3
-        )
-
-    [1] => Array
-        (
-            [a] => 7
-            [b] => 5
-            [c] => 6
-        )
-
-    [2] => Array
-        (
-            [a] => 10
-            [b] => 8
-            [c] => 9
-        )
-
-)
-```
-Extracting columns:
-```php
-$a = $df['a'];
-print_r($a->toArray());
------------------------
-Array
-(
-    [0] => Array
-        (
-            [a] => 1
-        )
-
-    [1] => Array
-        (
-            [a] => 4
-        )
-
-    [2] => Array
-        (
-            [a] => 7
-        )
-
-)
 ```
