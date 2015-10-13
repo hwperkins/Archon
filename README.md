@@ -243,7 +243,7 @@ $df['a'] = function ($el, $key) {
 };
 ```
 
-Applying functions to columns via proxy of other columns:
+Applying values columns via functional proxy of other columns:
 ```php
 $df['a'] = $df['c']->apply(function ($el, $key) {
     return $el + 1;
