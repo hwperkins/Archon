@@ -35,7 +35,22 @@ final class SQL
 
     public function __construct(PDO $pdo)
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo = $pdo;
+    }
+
+    /**
+     * Performs a SQL select, returning an associative array of the results.
+     * @param  $sqlQuery
+     * @return array
+     * @since  0.3.0
+     */
+    public function select($sqlQuery)
+    {
+        $pdo = $this->pdo;
+        $query = $pdo->query($sqlQuery);
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 
     /**
@@ -52,7 +67,6 @@ final class SQL
     public function insertInto($tableName, array $columns, array $data, $options = [])
     {
         $pdo = $this->pdo;
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $chunksizeOpt = $options['chunksize'];

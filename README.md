@@ -29,7 +29,7 @@ composer require archon/dataframe
  - php_mbstring extension
  
 ### Dependencies
- - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.0
+ - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.1
  - [gajus/dindent](https://github.com/gajus/dindent): 2.0.2
 
 ### License
