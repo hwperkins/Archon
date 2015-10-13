@@ -117,7 +117,7 @@ With support for [DataTables.js](http://datatables.net/):
 $dataTable = $df->toHTML(['datatable' => '{ "optionKey": "optionValue" }']);
 ```
 
-### Extracting the raw array:
+### Extracting a two-dimensional array:
 
 ```php
 $myArray = $df->toArray();
