@@ -43,11 +43,12 @@ final class JSON
     {
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
-        if ($options['pretty'] !== false) {
-            throw new NotYetImplementedException("Pretty JSON is not yet implemented.");
+        $prettyOpt = $options['pretty'];
+        if ($prettyOpt === true) {
+            $prettyOpt = JSON_PRETTY_PRINT;
         }
 
-        $data = json_encode($data);
+        $data = json_encode($data, $prettyOpt);
 
         return $data;
     }
