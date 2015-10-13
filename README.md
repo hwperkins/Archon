@@ -164,7 +164,7 @@ Array
 )
 ```
 
-## Basic operations:
+## Basic Operations
 
 Getting column names:
 ```php
