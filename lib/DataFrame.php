@@ -111,6 +111,20 @@ final class DataFrame extends DataFrameCore
     }
 
     /**
+     * Factory method for instantiating a DataFrame from a SQL query.
+     * @param  PDO $pdo
+     * @param  $sqlQuery
+     * @return DataFrame
+     * @since  0.3.0
+     */
+    public static function fromSQL(PDO $pdo, $sqlQuery)
+    {
+        $sql = new SQL($pdo);
+        $data = $sql->select($sqlQuery);
+        return new DataFrame($data);
+    }
+
+    /**
      * Commits a DataFrame to a SQL database.
      * @param PDO $pdo
      * @param $tableName
