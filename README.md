@@ -25,6 +25,8 @@ composer require archon/dataframe
 
 ### Requirements
  - PHP 5.5 or higher
+ - php_pdo_sqlite extension
+ - php_mbstring extension
  
 ### Dependencies
  - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.0
