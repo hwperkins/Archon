@@ -30,6 +30,15 @@ final class JSON
         'pretty' => false
     ];
 
+    /**
+     * Encodes a DataFrame array into a JSON string.
+     * @param  array $data
+     * @param  array $options
+     * @return array|string
+     * @throws NotYetImplementedException
+     * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.4.0
+     */
     public function encodeJSON(array $data, array $options)
     {
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
@@ -43,6 +52,14 @@ final class JSON
         return $data;
     }
 
+    /**
+     * Decodes a JSON string into a DataFrame array.
+     * @param  $jsonString
+     * @param  array $options
+     * @return mixed
+     * @throws \Archon\Exceptions\UnknownOptionException
+     * @since  0.4.0
+     */
     public function decodeJSON($jsonString, array $options)
     {
         Options::setDefaultOptions($options, $this->defaultOptions);
