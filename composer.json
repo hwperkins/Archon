@@ -19,7 +19,7 @@
     "satooshi/php-coveralls": "dev-master"
   },
   "autoload": {
-    "psr-4": { "Archon\\": "src/" }
+    "psr-4": { "Archon\\": "lib/" }
   },
   "autoload-dev" : {
     "psr-4": { "Archon\\Tests\\": "tests/" }
