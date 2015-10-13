@@ -23,6 +23,11 @@ composer require archon/dataframe
 }
 ```
 
+### Dependencies
+ - PHP 5.5 or higher
+ - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.0
+ - [gajus/dindent](https://github.com/gajus/dindent): 2.0.2
+ 
 ## Data Format Examples
 
 ### Instantiating from an array:
@@ -211,3 +216,4 @@ $df['a'] = $df['c']->apply(function ($el, $key) {
     return $el + 1;
 });
 ```
+
