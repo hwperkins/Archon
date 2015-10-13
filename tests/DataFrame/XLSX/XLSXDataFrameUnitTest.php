@@ -104,9 +104,9 @@ class XLSXDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $c = DataFrame::fromArray($sheetC);
 
         $xlsx = new PHPExcel();
-        $a->toWorksheet($xlsx, 'A');
-        $b->toWorksheet($xlsx, 'B');
-        $c->toWorksheet($xlsx, 'C');
+        $a->toXLSXWorksheet($xlsx, 'A');
+        $b->toXLSXWorksheet($xlsx, 'B');
+        $c->toXLSXWorksheet($xlsx, 'C');
 
         $this->assertEquals($a->toArray(), $sheetA);
         $this->assertEquals($b->toArray(), $sheetB);
@@ -115,9 +115,9 @@ class XLSXDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $writer = new PHPExcel_Writer_Excel2007($xlsx);
         $writer->save($fileName);
 
-        $a = DataFrame::fromXLSX($fileName, ['sheet_name' => 'A']);
-        $b = DataFrame::fromXLSX($fileName, ['sheet_name' => 'B']);
-        $c = DataFrame::fromXLSX($fileName, ['sheet_name' => 'C']);
+        $a = DataFrame::fromXLSX($fileName, ['sheetname' => 'A']);
+        $b = DataFrame::fromXLSX($fileName, ['sheetname' => 'B']);
+        $c = DataFrame::fromXLSX($fileName, ['sheetname' => 'C']);
 
         $this->assertEquals($a->toArray(), $sheetA);
         $this->assertEquals($b->toArray(), $sheetB);

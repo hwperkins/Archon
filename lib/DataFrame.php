@@ -16,7 +16,10 @@ use Archon\IO\CSV;
 use Archon\IO\FWF;
 use Archon\IO\HTML;
 use Archon\IO\SQL;
+use Archon\IO\XLSX;
 use PDO;
+use PHPExcel;
+use PHPExcel_Worksheet;
 
 /**
  * The DataFrame class acts as an interface to various underlying data structure, file format, and database
@@ -80,11 +83,46 @@ final class DataFrame extends DataFrameCore
         return new DataFrame($data);
     }
 
+    /**
+     * Factory method for creating a DataFrame from an XLSX worksheet.
+     * @param  $fileName
+     * @param  array $options
+     * @return DataFrame
+     * @since  0.3.0
+     */
+    public static function fromXLSX($fileName, array $options = [])
+    {
+        $xlsx = new XLSX($fileName);
+        $data = $xlsx->loadFile($options);
+        return new DataFrame($data);
+    }
+
+    /**
+     * Output a DataFrame as a PHPExcel worksheet.
+     * @param PHPExcel $excel
+     * @param $worksheetTitle
+     * @return PHPExcel_Worksheet
+     * @since  0.3.0
+     */
+    public function toXLSXWorksheet(PHPExcel &$excel, $worksheetTitle)
+    {
+        $worksheet = XLSX::saveToWorksheet($excel, $worksheetTitle, $this->data, $this->columns);
+        return $worksheet;
+    }
+
+    /**
+     * Commits a DataFrame to a SQL database.
+     * @param PDO $pdo
+     * @param $tableName
+     * @param array $options
+     * @since 0.2.0
+     */
     public function toSQL(PDO $pdo, $tableName, array $options = [])
     {
         $sql = new SQL($pdo);
         $sql->insertInto($tableName, $this->columns, $this->data, $options);
     }
+
     /**
      * Outputs a DataFrame to an HTML string.
      * @param  array $options
