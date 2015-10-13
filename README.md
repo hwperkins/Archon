@@ -55,6 +55,19 @@ $df = DataFrame::fromCSV($fileName, [
 ]);
 ```
 
+### Writing a CSV file:
+
+```php
+$df->toCSV($fileName);
+```
+
+```
+"a","b","c"
+"1","2","3"
+"4","5","6"
+"7","8","9"
+```
+
 ### Reading a fixed-width file:
 
 ```
