@@ -249,4 +249,3 @@ $df['a'] = $df['c']->apply(function ($el, $key) {
     return $el + 1;
 });
 ```
-
