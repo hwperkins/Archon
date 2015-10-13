@@ -31,7 +31,10 @@ composer require archon/dataframe
 ### Dependencies
  - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.0
  - [gajus/dindent](https://github.com/gajus/dindent): 2.0.2
- 
+
+### License
+[BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause)
+
 ## Data Format Examples
 
 ### Instantiating from an array:
