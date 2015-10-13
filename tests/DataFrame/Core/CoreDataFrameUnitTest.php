@@ -21,13 +21,6 @@ class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $this->df = DataFrame::fromArray($this->input);
     }
 
-    public function testOutput()
-    {
-        $df = $this->df;
-        $df['d'] = '';
-        print_r($df->toArray());
-    }
-
     public function testFromArray()
     {
         $this->assertEquals($this->input, $this->df->toArray());

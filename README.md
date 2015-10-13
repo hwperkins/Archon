@@ -23,8 +23,10 @@ composer require archon/dataframe
 }
 ```
 
-### Dependencies
+### Requirements
  - PHP 5.5 or higher
+ 
+### Dependencies
  - [PHPOffice/PHPExcel](https://github.com/PHPOffice/PHPExcel): 1.8.0
  - [gajus/dindent](https://github.com/gajus/dindent): 2.0.2
  
