@@ -32,6 +32,7 @@ final class JSON
 
     /**
      * Encodes a DataFrame array into a JSON string.
+     *      pretty: Will "prettify" the rendered JSON (default: false)
      * @param  array $data
      * @param  array $options
      * @return array|string
