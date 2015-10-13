@@ -18,7 +18,7 @@ composer require archon/dataframe
 ```json
 {
     "require": {
-        "archon/dataframe": "0.2.0"
+        "archon/dataframe": "0.3.0"
     }
 }
 ```
@@ -97,6 +97,32 @@ $df = DataFrame::fromFWF($fileName, [
     'c' => [11, 12]
 ], ['include' => '^[0-9]']);
 
+```
+
+### Reading an XLSX spreadsheet:
+
+```php
+$dfA = DataFrame::fromXLSX($fileName, ['sheetname' => 'Sheet A']);
+$dfB = DataFrame::fromXLSX($fileName, ['sheetname' => 'Sheet B']);
+$dfC = DataFrame::fromXLSX($fileName, ['sheetname' => 'Sheet C']);
+```
+
+### Writing an XLSX spreadsheet:
+
+```php
+$phpExcel = new PHPExcel();
+$dfA->toXLSXWorksheet($phpExcel, 'Sheet A');
+$dfB->toXLSXWorksheet($phpExcel, 'Sheet B');
+$dfC->toXLSXWorksheet($phpExcel, 'Sheet C');
+$writer = new PHPExcel_Writer_Excel2007($phpExcel);
+$writer->save($fileName);
+```
+
+### Querying from a database:
+
+```php
+$pdo = new PDO('sqlite::memory:');
+$df = DataFrame::fromSQL($pdo, 'SELECT foo, bar, baz FROM table_name;');
 ```
 
 ### Committing to a database:
