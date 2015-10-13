@@ -9,7 +9,7 @@
     "php": ">=5.5",
     "ext-mbstring": "*",
     "ext-pdo_sqlite": "*",
-    "phpoffice/phpexcel": "1.8.0",
+    "phpoffice/phpexcel": "1.8.1",
     "gajus/dindent": "2.0.2"
   },
   "require-dev": {
