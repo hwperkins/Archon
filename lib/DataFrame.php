@@ -15,6 +15,7 @@ namespace Archon;
 use Archon\IO\CSV;
 use Archon\IO\FWF;
 use Archon\IO\HTML;
+use Archon\IO\JSON;
 use Archon\IO\SQL;
 use Archon\IO\XLSX;
 use PDO;
@@ -135,6 +136,33 @@ final class DataFrame extends DataFrameCore
     {
         $sql = new SQL($pdo);
         $sql->insertInto($tableName, $this->columns, $this->data, $options);
+    }
+
+    /**
+     * Factory method for instantiating a DataFrame from a JSON string.
+     * @param  $jsonString
+     * @param  array $options
+     * @return mixed
+     * @since  0.4.0
+     */
+    public static function fromJSON($jsonString, array $options = [])
+    {
+        $json = new JSON();
+        $data = $json->decodeJSON($jsonString, $options);
+        return new DataFrame($data);
+    }
+
+    /**
+     * Converts a DataFrame to a JSON string.
+     * @param  array $options
+     * @return string
+     * @since  0.4.0
+     */
+    public function toJSON(array $options = [])
+    {
+        $json = new JSON();
+        $data = $json->encodeJSON($this->data, $options);
+        return $data;
     }
 
     /**
