@@ -18,7 +18,7 @@ composer require archon/dataframe
 ```json
 {
     "require": {
-        "archon/dataframe": "0.3.0"
+        "archon/dataframe": "0.4.0"
     }
 }
 ```
@@ -155,7 +155,23 @@ With support for [DataTables.js](http://datatables.net/):
 $dataTable = $df->toHTML(['datatable' => '{ "optionKey": "optionValue" }']);
 ```
 
-### Extracting a two-dimensional array:
+### Converting to JSON:
+
+```php
+$json = $df->toJSON();
+```
+
+### Creating from JSON:
+
+```php
+$df = DataFrame::fromJSON('[
+    {"a": 1, "b": 2, "c": 3},
+    {"a": 4, "b": 5, "c": 6},
+    {"a": 7, "b": 8, "c": 9}
+]');
+```
+
+### Extracting as a two-dimensional array:
 
 ```php
 $myArray = $df->toArray();
