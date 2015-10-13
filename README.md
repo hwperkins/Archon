@@ -5,7 +5,7 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/archon/dataframe.svg?style=flat-square)](https://packagist.org/packages/archon/dataframe)
 [![License](https://img.shields.io/packagist/l/archon/dataframe.svg?style=flat-square)](https://packagist.org/packages/archon/dataframe)
 
-Archon is a PHP library which is designed to make working with tabular/relational data, files, and databases easy. The core component of the library is the DataFrame class - a tabular data structure which raises the level of abstraction when working with tabular, two-dimensional data. 
+Archon is a PHP library designed to make working with tabular/relational data, files, and databases easy. The core component of the library is the DataFrame class - a tabular data structure which raises the level of abstraction when working with tabular, two-dimensional data. 
 
 ## Installation
 
