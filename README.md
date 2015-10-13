@@ -83,18 +83,18 @@ $df->toCSV($fileName);
 ### Reading a fixed-width file:
 
 ```
-sun moon stars
---------------
-1    2     3
-4    5     6
-7    8     9
+foo bar baz
+-----------
+1   2   3
+4   5   6
+7   8   9
 ```
 
 ```php
 $df = DataFrame::fromFWF($fileName, [
 	'a' => [0, 1],
-    'b' => [5, 6],
-    'c' => [11, 12]
+    'b' => [4, 5],
+    'c' => [8, 9]
 ], ['include' => '^[0-9]']);
 
 ```
@@ -171,14 +171,13 @@ $df = DataFrame::fromJSON('[
 ]');
 ```
 
-### Extracting as a two-dimensional array:
+### Extracting the underlying two-dimensional array:
 
 ```php
 $myArray = $df->toArray();
 print_r($myArray);
 ```
 
-Outputs:
 ```php
 Array
 (
@@ -234,6 +233,7 @@ Counting rows:
 ```php
 count($df);
 ```
+
 Iterating over rows:
 ```php
 foreach ($df as $i => $row) {
@@ -244,6 +244,7 @@ foreach ($df as $i => $row) {
 1: 4-5-6
 2: 7-8-9
 ```
+
 Applying functions to rows:
 ```php
 $df = $df->apply(function ($row, $index) {
@@ -259,9 +260,14 @@ $df['a'] = function ($el, $key) {
 };
 ```
 
-Applying values columns via functional proxy of other columns:
+Applying values to columns via function application of other columns:
 ```php
 $df['a'] = $df['c']->apply(function ($el, $key) {
     return $el + 1;
 });
+```
+
+Applying types:
+```
+Coming soon...
 ```
