@@ -18,7 +18,7 @@ composer require archon/dataframe
 ```json
 {
     "require": {
-        "archon/dataframe": "0.4.0"
+        "archon/dataframe": "0.4.1"
     }
 }
 ```
