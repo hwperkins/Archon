@@ -17,6 +17,21 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         ], $df->toArray());
     }
 
+    public function testFromCSVDirty()
+    {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVdirty.csv';
+
+        $df = DataFrame::fromCSV($fileName, [
+            'include' => '/^([1-9]|a)/',
+            'exclude' => '/^([7]|junk)/'
+        ]);
+
+        $this->assertEquals([
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+        ], $df->toArray());
+    }
+
     public function testFromCSVNoHeader()
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';

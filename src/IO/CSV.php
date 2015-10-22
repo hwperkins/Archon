@@ -34,8 +34,9 @@ final class CSV
         'colmap' => null,
         'quote' => "\"",
         'escape' => "\\",
-
-        'overwrite' => false
+        'overwrite' => false,
+        'include' => null,
+        'exclude' => null
     ];
 
     public function __construct($fileName)
@@ -54,6 +55,8 @@ final class CSV
      *               to be once loaded into memory (default: null)
      *      quote:   The character used to specify literal quoted segments (default: ")
      *      escape:  The character used to escape quotes or other special characters (default: \)
+     *      include: Whitelist Regular Expression
+     *      exclude: Blacklist Regular Expression
      * @param  array $options The option map.
      * @return array         Returns multi-dimensional array of row-column strings.
      * @throws \Archon\Exceptions\UnknownOptionException
@@ -71,9 +74,17 @@ final class CSV
         $colmapOpt = $options['colmap'];
         $quoteOpt = $options['quote'];
         $escapeOpt = $options['escape'];
+        $includeRegexOpt = $options['include'];
+        $excludeRegexOpt = $options['exclude'];
 
         $fileData = file_get_contents($fileName);
         $fileData = explode($nlsepOpt, $fileData);
+
+        // Remove whitespace/empty lines
+        $fileData = preg_grep('/^\s*$/', $fileData, PREG_GREP_INVERT);
+
+        $fileData = $includeRegexOpt ? preg_grep($includeRegexOpt, $fileData) : $fileData;
+        $fileData = $excludeRegexOpt ? preg_grep($excludeRegexOpt, $fileData, PREG_GREP_INVERT) : $fileData;
 
         /**
          * Determines how to assign columns of the CSV
@@ -107,15 +118,8 @@ final class CSV
         foreach ($fileData as $i => $line) {
             $line = trim($line);
 
-            if ($line === '') {
-                unset($fileData[$i]);
-                continue;
-            }
-
-            if ($line !== '') {
-                $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
-                $fileData[$i] = $this->applyColMapToRowKeys($line, $columns);
-            }
+            $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
+            $fileData[$i] = $this->applyColMapToRowKeys($line, $columns);
         }
 
         $fileData = array_values($fileData);
