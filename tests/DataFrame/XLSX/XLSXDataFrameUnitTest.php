@@ -11,7 +11,8 @@ class XLSXDataFrameUnitTest extends \PHPUnit_Framework_TestCase
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'test.xlsx';
 
-        $xlsx = DataFrame::fromXLSX($fileName);
+        // Suppress warning coming from PHPExcel date/time nonsense
+        $xlsx = @DataFrame::fromXLSX($fileName);
         $xlsx = $xlsx->toArray();
 
         $assertion_array = [
@@ -113,11 +114,12 @@ class XLSXDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($c->toArray(), $sheetC);
 
         $writer = new PHPExcel_Writer_Excel2007($xlsx);
-        $writer->save($fileName);
+        @$writer->save($fileName); // Suppress warning coming from PHPExcel date/time nonsense
 
-        $a = DataFrame::fromXLSX($fileName, ['sheetname' => 'A']);
-        $b = DataFrame::fromXLSX($fileName, ['sheetname' => 'B']);
-        $c = DataFrame::fromXLSX($fileName, ['sheetname' => 'C']);
+        // Suppress warning coming from PHPExcel date/time nonsense
+        @$a = DataFrame::fromXLSX($fileName, ['sheetname' => 'A']);
+        @$b = DataFrame::fromXLSX($fileName, ['sheetname' => 'B']);
+        @$c = DataFrame::fromXLSX($fileName, ['sheetname' => 'C']);
 
         $this->assertEquals($a->toArray(), $sheetA);
         $this->assertEquals($b->toArray(), $sheetB);
