@@ -34,6 +34,7 @@ final class CSV
         'columns' => null,
         'colline' => 0,
         'colmap' => null,
+        'mapping' => null,
         'quote' => "\"",
         'escape' => "\\",
         'overwrite' => false,
@@ -55,13 +56,14 @@ final class CSV
      *      colline: The line of the CSV file where columns are specified (default: 0)
      *      colmap:  Optional mapping for renaming columns from what they are in the file to what the user wants them
      *               to be once loaded into memory (default: null)
+     *      mapping: colmap alias
      *      quote:   The character used to specify literal quoted segments (default: ")
      *      escape:  The character used to escape quotes or other special characters (default: \)
      *      include: Whitelist Regular Expression
      *      exclude: Blacklist Regular Expression
      * @param  array $options The option map.
-     * @return array         Returns multi-dimensional array of row-column strings.
-     * @throws \Archon\Exceptions\UnknownOptionException
+     * @return array Returns multi-dimensional array of row-column strings.
+     * @throws InvalidColumnException
      * @since  0.1.0
      */
     public function loadFile(array $options = [])
@@ -70,23 +72,17 @@ final class CSV
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
         $sepOpt = $options['sep'];
-        $nlsepOpt = $options['nlsep'];
         $columnsOpt = $options['columns'];
         $collineOpt = $options['colline'];
-        $colmapOpt = $options['colmap'];
         $quoteOpt = $options['quote'];
         $escapeOpt = $options['escape'];
         $includeRegexOpt = $options['include'];
         $excludeRegexOpt = $options['exclude'];
 
+        $colmapOpt = $options['colmap'] ?? $options['mapping'];
+
         $fileData = file_get_contents($fileName);
-        $fileData = explode($nlsepOpt, $fileData);
-
-        // Remove whitespace/empty lines
-        $fileData = preg_grep('/^\s*$/', $fileData, PREG_GREP_INVERT);
-
-        $fileData = $includeRegexOpt ? preg_grep($includeRegexOpt, $fileData) : $fileData;
-        $fileData = $excludeRegexOpt ? preg_grep($excludeRegexOpt, $fileData, PREG_GREP_INVERT) : $fileData;
+        $fileData = $this->scrubRawData($fileData, $options);
 
         if ($sepOpt === null) {
             $sepOpt = self::autoDetectDelimiter($fileData);
@@ -100,22 +96,27 @@ final class CSV
         if ($columnsOpt === null) {
             $columns = $fileData[$collineOpt];
             $columns = str_getcsv($columns, $sepOpt, $quoteOpt, $escapeOpt);
+            $columns = array_map('trim', array_map('trim', $columns));
+
+            /**
+             * Rename columns if a colmap exists
+             * Columns which are mapped to null are flagged for removal
+             */
+            if ($colmapOpt !== null) {
+                foreach ($columns as &$column) {
+                    if (array_search($column, array_keys($colmapOpt)) !== false) {
+                        $column = $colmapOpt[$column];
+                    }
+                }
+            }
+
             unset($fileData[$collineOpt]);
         } else {
             $columns = $columnsOpt;
         }
 
-        /**
-         * Rename columns if a colmap exists
-         * Columns which are mapped to null are flagged for removal
-         */
-        if ($colmapOpt !== null) {
-            foreach ($columns as &$column) {
-                if (array_search($column, array_keys($colmapOpt)) !== false) {
-                    $column = $colmapOpt[$column];
-                }
-            }
-        }
+        $fileData = $includeRegexOpt ? preg_grep($includeRegexOpt, $fileData) : $fileData;
+        $fileData = $excludeRegexOpt ? preg_grep($excludeRegexOpt, $fileData, PREG_GREP_INVERT) : $fileData;
 
         /**
          * Parses each trimmed line with str_getcsv as an associative array
@@ -163,6 +164,33 @@ final class CSV
         }
 
         return $newRow;
+    }
+
+    private function scrubRawData($fileData, $options) {
+        $options = Options::setDefaultOptions($options, $this->defaultOptions);
+        $nlsepOpt = $options['nlsep'];
+
+        $fileData = trim($fileData);
+
+        // Remove non-ASCII characters from each line of the file
+        $fileData = preg_replace("/[^[:ascii:]]/", "", $fileData);
+        $fileData = str_replace("\f", '', $fileData); // remove form feed
+
+        $fileData = preg_split("/\r\n|\n|\r|{$nlsepOpt}/", $fileData);
+
+        foreach ($fileData as $i => &$line) {
+            try {
+                $inputEncoding = mb_detect_encoding($line, mb_detect_order(), true);
+                $line = iconv($inputEncoding, "UTF-8", $line);
+            } catch (\Exception $e) {
+                throw new \Exception("Detected illegal character {$i}: {$line}");
+            }
+        }
+
+        // Remove whitespace/empty lines
+        $fileData = preg_grep('/^\s*$/', $fileData, PREG_GREP_INVERT);
+
+        return $fileData;
     }
 
     /**

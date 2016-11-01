@@ -63,6 +63,29 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         ], $df->toArray());
     }
 
+    public function testCSVMappingAlias()
+    {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
+
+        $df1 = DataFrame::fromCSV($fileName, [
+            'colmap' => [
+                'a' => 'x',
+                'b' => 'y',
+                'c' => 'z'
+            ]
+        ]);
+
+        $df2 = DataFrame::fromCSV($fileName, [
+            'mapping' => [
+                'a' => 'x',
+                'b' => 'y',
+                'c' => 'z'
+            ]
+        ]);
+
+        $this->assertEquals($df1->toArray(), $df2->toArray());
+    }
+
     public function testFromCSVcolMapToNull()
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
