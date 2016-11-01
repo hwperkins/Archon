@@ -159,6 +159,12 @@ final class CSV
         return $newRow;
     }
 
+    /**
+     * Auto detects the delimiter used in a given CSV file from a list of given delimiters.
+     *
+     * @param array $data
+     * @return int|mixed|null|string
+     */
     private function autoDetectDelimiter(array $data) {
         $delimiters = [
             ',',
@@ -170,9 +176,9 @@ final class CSV
 
         $results = [];
 
-        $row_count = 0;
+        $rowCount = 0;
         foreach ($data as $row) {
-            $row_count += 1;
+            $rowCount += 1;
 
             foreach ($delimiters as $delimiter) {
                 $fields = preg_split('/['.$delimiter.']/', $row);
@@ -183,14 +189,14 @@ final class CSV
                 }
             }
 
-            if ($row_count === 5) break;
+            if ($rowCount === 5) break;
         }
 
         $delimiter = null;
-        $highest_count = 0;
+        $highestCount = 0;
         foreach ($results as $result => $count) {
-            if ($count > $highest_count) {
-                $highest_count = $count;
+            if ($count > $highestCount) {
+                $highestCount = $count;
                 $delimiter = $result;
             }
         }

@@ -27,4 +27,12 @@ class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
         DataFrame::fromCSV($fileName, ['invalid_option' => 0]);
 
     }
+
+    public function testUnknownDelimiter()
+    {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVUnknownDelimiter.csv';
+
+        $this->setExpectedException('RuntimeException');
+        DataFrame::fromCSV($fileName);
+    }
 }
