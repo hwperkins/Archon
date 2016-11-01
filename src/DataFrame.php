@@ -118,7 +118,7 @@ final class DataFrame extends DataFrameCore
      * @return DataFrame
      * @since  0.3.0
      */
-    public static function fromSQL(PDO $pdo, $sqlQuery)
+    public static function fromSQL($sqlQuery, PDO $pdo)
     {
         $sql = new SQL($pdo);
         $data = $sql->select($sqlQuery);
@@ -132,7 +132,7 @@ final class DataFrame extends DataFrameCore
      * @param array $options
      * @since 0.2.0
      */
-    public function toSQL(PDO $pdo, $tableName, array $options = [])
+    public function toSQL($tableName, PDO $pdo, array $options = [])
     {
         $sql = new SQL($pdo);
         $sql->insertInto($tableName, $this->columns, $this->data, $options);
@@ -182,19 +182,11 @@ final class DataFrame extends DataFrameCore
     /**
      * Factory method for creating a DataFrame from a two-dimensional associative array.
      * @param  array $data
-     * @param  array $options
      * @return DataFrame
      * @since  0.1.0
      */
-    public static function fromArray(array $data, array $options = [])
+    public static function fromArray(array $data)
     {
-        $firstRow = current($data);
-        $columns = isset($options['columns']) ? $options['columns'] : array_keys($firstRow);
-
-        foreach ($data as &$row) {
-            $row = array_combine($columns, $row);
-        }
-
         return new DataFrame($data);
     }
 

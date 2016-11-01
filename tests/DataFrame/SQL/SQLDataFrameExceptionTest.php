@@ -23,7 +23,7 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
             ['a' => 4, 'b' => 5, 'c' => 6],
             ['a' => 7, 'b' => 8, 'c' => 9],
         ]);
-        $good->toSQL($pdo, 'testTable');
+        $good->toSQL('testTable', $pdo);
 
         // and make sure the output exactly matches the input.
         $result = $pdo->query("SELECT * FROM testTable;")->fetchAll(PDO::FETCH_ASSOC);
@@ -43,7 +43,7 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->setExpectedException('PDOException');
-            $bad->toSQL($pdo, 'testTable', ['chunksize' => 1]);
+            $bad->toSQL('testTable', $pdo, ['chunksize' => 1]);
         } catch (PDOException $e) {
             /*
              * We throw the original exception back here so that we can perform one

@@ -40,8 +40,10 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     protected function __construct(array $data)
     {
-        $this->data = $data;
-        $this->columns = array_keys(current($data));
+        if (count($data) > 0) {
+            $this->data = array_values($data);
+            $this->columns = array_keys(current($data));
+        }
     }
 
     /**

@@ -17,7 +17,7 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $pdo = new PDO('sqlite::memory:');
 
         $pdo->exec("CREATE TABLE testTable (a TEXT, b TEXT, c TEXT);");
-        $df->toSQL($pdo, 'testTable');
+        $df->toSQL('testTable', $pdo);
         $result = $pdo->query("SELECT * FROM testTable;")->fetchAll(PDO::FETCH_ASSOC);
         $this->assertEquals($result, $df->toArray());
         $pdo->exec("DROP TABLE testTable;");
@@ -29,7 +29,7 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $pdo->exec("CREATE TABLE testFromSQL (x TEXT, y TEXT, z TEXT);");
         $pdo->exec("INSERT INTO testFromSQL (x, y, z) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);");
 
-        $df = DataFrame::fromSQL($pdo, "SELECT * FROM testFromSQL;");
+        $df = DataFrame::fromSQL("SELECT * FROM testFromSQL;", $pdo);
 
         $pdo->exec("DROP TABLE testFromSQL;");
 
