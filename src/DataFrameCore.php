@@ -185,6 +185,31 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
+     * Renames specific column.
+     *
+     * ie:
+     *      $df->renameColumn('old_name', 'new_name');
+     *
+     * @param $from
+     * @param $to
+     */
+    public function renameColumn($from, $to) {
+        $this->mustHaveColumn($from);
+
+        foreach ($this as $i => $row) {
+            $keys = array_keys($row);
+            $index = array_search($from, $keys);
+            $keys[$index] = $to;
+            $this->data[$i] = array_combine($keys, $row);
+        }
+
+        $key = array_search($from, $this->columns);
+        if(($key) !== false) {
+            $this->columns[$key] = $to;
+        }
+    }
+
+    /**
      * Removes a column (and all associated data) from the DataFrame.
      * @param $columnName
      * @since 0.1.0
