@@ -156,7 +156,7 @@ final class SQL
 
         if ($replace_opt === true) {
             $insert = 'REPLACE';
-        } elseif ($ignore_opt === true) {
+        } else if ($ignore_opt === true) {
             $insert = 'INSERT IGNORE';
         } else {
             $insert = 'INSERT';
