@@ -18,6 +18,7 @@ use Closure;
 use Countable;
 use Iterator;
 use ArrayAccess;
+use PDO;
 
 /**
  * The DataFrameCore class acts as the implementation for the various data manipulation features of the DataFrame class.
@@ -89,6 +90,53 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
 
         return $this;
+    }
+
+    /**
+     * Allows SQL to be used to perform operations on the DataFrame
+     *
+     * Table name will always be 'dataframe'
+     *
+     * @param $sql
+     * @param PDO $pdo
+     * @return DataFrame
+     * @throws DataFrameException
+     */
+    public function query($sql, PDO $pdo = null) {
+        $sql = trim($sql);
+        $query_type = trim(strtoupper(strtok($sql, ' ')));
+
+        if ($pdo === null) {
+            $pdo = new PDO('sqlite::memory:');
+        }
+
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if ($driver === 'sqlite') {
+            $sql_columns = implode(', ', $this->columns);
+        } elseif ($driver === 'mysql') {
+            $sql_columns = implode(' VARCHAR(255), ', $this->columns) . ' VARCHAR(255)';
+        } else {
+            throw new DataFrameException("{$driver} is not yet supported for DataFrame query.");
+        }
+
+        $pdo->exec("DROP TABLE IF EXISTS dataframe;");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dataframe ({$sql_columns});");
+
+        $df = DataFrame::fromArray($this->data);
+        $df->toSQL('dataframe', $pdo);
+
+        if ($query_type === 'SELECT') {
+            $result = $pdo->query($sql, PDO::FETCH_ASSOC);
+        } else {
+            $pdo->exec($sql);
+            $result = $pdo->query("SELECT * FROM dataframe;", PDO::FETCH_ASSOC);
+        }
+
+        $results = $result->fetchAll();
+
+        $pdo->exec("DROP TABLE IF EXISTS dataframe;");
+
+        return DataFrame::fromArray($results);
     }
 
     /**
