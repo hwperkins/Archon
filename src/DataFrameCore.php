@@ -190,6 +190,31 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         unset($this[$columnName]);
     }
 
+    /**
+     * Allows user to "array_merge" two DataFrames so that the rows of one are appended to the rows of another.
+     *
+     * @param $other
+     * @return $this
+     */
+    public function append(DataFrame $other) {
+        if (count($other) <= 0) {
+            return $this;
+        }
+
+        $columns = $this->columns;
+
+        foreach ($other as $row) {
+            $new_row = [];
+            foreach ($columns as $column) {
+                $new_row[$column] = $row[$column];
+            }
+
+            $this->data[] = $new_row;
+        }
+
+        return $this;
+    }
+
     /* *****************************************************************************************************************
      ******************************************* ArrayAccess Implementation ********************************************
      ******************************************************************************************************************/
