@@ -21,6 +21,8 @@ namespace Archon\Exceptions;
  * @license   https://github.com/HWGehring/Archon/blob/master/LICENSE BSD-3-Clause
  * @link      https://github.com/HWGehring/Archon
  * @since     0.1.0
+ *
+ * @codeCoverageIgnore
  */
 class FileExistsException extends DataFrameException
 {
