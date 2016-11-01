@@ -130,13 +130,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $df->toSQL('dataframe', $pdo);
 
         if ($queryType === 'SELECT') {
-            $result = $pdo->query($sql, PDO::FETCH_ASSOC);
+            $result = $pdo->query($sql);
         } else {
             $pdo->exec($sql);
-            $result = $pdo->query("SELECT * FROM dataframe;", PDO::FETCH_ASSOC);
+            $result = $pdo->query("SELECT * FROM dataframe;");
         }
 
-        $results = $result->fetchAll();
+        $results = $result->fetchAll(PDO::FETCH_ASSOC);
 
         $pdo->exec("DROP TABLE IF EXISTS dataframe;");
 

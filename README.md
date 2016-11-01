@@ -302,3 +302,73 @@ Array
 
 )
 ```
+
+Manipulating DataFrame using SQL:
+```php
+$df = DataFrame::fromArray([
+    ['a' => 1, 'b' => 2, 'c' => 3],
+    ['a' => 4, 'b' => 5, 'c' => 6],
+    ['a' => 7, 'b' => 8, 'c' => 9],
+]);
+
+$df = $df->query("SELECT
+  a,
+  b
+FROM dataframe
+WHERE a = '4'
+  OR b = '2';");
+
+print_r($df->toArray());
+```
+
+```php
+Array
+(
+    [0] => Array
+        (
+            [a] => 1
+            [b] => 2
+        )
+
+    [1] => Array
+        (
+            [a] => 4
+            [b] => 5
+        )
+
+)
+```
+
+```php
+$df = DataFrame::fromArray([
+    ['a' => 1, 'b' => 2, 'c' => 3],
+    ['a' => 4, 'b' => 5, 'c' => 6],
+    ['a' => 7, 'b' => 8, 'c' => 9],
+]);
+
+$df = $df->query("UPDATE dataframe
+SET a = c * 2;");
+
+print_r($df['a']->to_array());
+```
+
+```php
+Array
+(
+    [0] => Array
+        (
+            [a] => 6
+        )
+
+    [1] => Array
+        (
+            [a] => 12
+        )
+
+    [2] => Array
+        (
+            [a] => 18
+        )
+
+)
+```
