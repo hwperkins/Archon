@@ -13,6 +13,7 @@
 namespace Archon\IO;
 
 use Archon\Exceptions\FileExistsException;
+use Archon\Exceptions\InvalidColumnException;
 use RuntimeException;
 
 /**
@@ -124,7 +125,12 @@ final class CSV
             $line = trim($line);
 
             $line = str_getcsv($line, $sepOpt, $quoteOpt, $escapeOpt);
-            $fileData[$i] = $this->applyColMapToRowKeys($line, $columns);
+
+            if (count($columns) != count($line)) {
+                throw new InvalidColumnException("Column count of line {$i} does not match column count of header.");
+            }
+
+            $fileData[$i] = array_map('trim', $this->applyColMapToRowKeys($line, $columns));
         }
 
         $fileData = array_values($fileData);

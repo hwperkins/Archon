@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\CSV;
 
 use Archon\DataFrame;
+use PHPUnit_Framework_TestCase;
 
-class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
+class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
 {
 
     public function testOverwriteFailCSV()
@@ -35,4 +36,13 @@ class CSVDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('RuntimeException');
         DataFrame::fromCSV($fileName);
     }
+
+    public function testInvalidColumnCount()
+    {
+        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVInvalidColumnCount.csv';
+
+        $this->setExpectedException('Archon\Exceptions\InvalidColumnException');
+        DataFrame::fromCSV($fileName);
+    }
+
 }
