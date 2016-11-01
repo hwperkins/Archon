@@ -17,9 +17,9 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $expected .= "<thead><tr><th>a</th><th>b</th><th>c</th></tr></thead>";
         $expected .= "<tfoot><tr><th>a</th><th>b</th><th>c</th></tr></tfoot>";
         $expected .= "<tbody>";
-        $expected .= "<tr><th>1</th><th>2</th><th>3</th></tr>";
-        $expected .= "<tr><th>4</th><th>5</th><th>6</th></tr>";
-        $expected .= "<tr><th>7</th><th>8</th><th>9</th></tr>";
+        $expected .= "<tr><td>1</td><td>2</td><td>3</td></tr>";
+        $expected .= "<tr><td>4</td><td>5</td><td>6</td></tr>";
+        $expected .= "<tr><td>7</td><td>8</td><td>9</td></tr>";
         $expected .= "</tbody>";
         $expected .= "</table>";
 
@@ -51,19 +51,19 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $expected .= "    </tfoot>\n";
         $expected .= "    <tbody>\n";
         $expected .= "        <tr>\n";
-        $expected .= "            <th>1</th>\n";
-        $expected .= "            <th>2</th>\n";
-        $expected .= "            <th>3</th>\n";
+        $expected .= "            <td>1</td>\n";
+        $expected .= "            <td>2</td>\n";
+        $expected .= "            <td>3</td>\n";
         $expected .= "        </tr>\n";
         $expected .= "        <tr>\n";
-        $expected .= "            <th>4</th>\n";
-        $expected .= "            <th>5</th>\n";
-        $expected .= "            <th>6</th>\n";
+        $expected .= "            <td>4</td>\n";
+        $expected .= "            <td>5</td>\n";
+        $expected .= "            <td>6</td>\n";
         $expected .= "        </tr>\n";
         $expected .= "        <tr>\n";
-        $expected .= "            <th>7</th>\n";
-        $expected .= "            <th>8</th>\n";
-        $expected .= "            <th>9</th>\n";
+        $expected .= "            <td>7</td>\n";
+        $expected .= "            <td>8</td>\n";
+        $expected .= "            <td>9</td>\n";
         $expected .= "        </tr>\n";
         $expected .= "    </tbody>\n";
         $expected .= "</table>";
@@ -83,9 +83,9 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
             return $tableString."<thead><tr><th>a</th><th>b</th><th>c</th></tr></thead>"
                 ."<tfoot><tr><th>a</th><th>b</th><th>c</th></tr></tfoot>"
                 ."<tbody>"
-                ."<tr><th>1</th><th>2</th><th>3</th></tr>"
-                ."<tr><th>4</th><th>5</th><th>6</th></tr>"
-                ."<tr><th>7</th><th>8</th><th>9</th></tr>"
+                ."<tr><td>1</td><td>2</td><td>3</td></tr>"
+                ."<tr><td>4</td><td>5</td><td>6</td></tr>"
+                ."<tr><td>7</td><td>8</td><td>9</td></tr>"
                 ."</tbody>"
                 ."</table>";
         };
@@ -95,18 +95,18 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
             'class' => 'classname'
         ]));
 
-        $expected = $fnExpected("<table id='#idname'>");
+        $expected = $fnExpected("<table id='idname'>");
         $this->assertEquals($expected, $df->toHTML([
-            'id' => '#idname'
+            'id' => 'idname'
         ]));
 
-        $expected = $fnExpected("<table class='classname' id='#idname'>");
+        $expected = $fnExpected("<table class='classname' id='idname'>");
         $this->assertEquals($expected, $df->toHTML([
             'class' => 'classname',
             'id' => 'idname'
         ]));
 
-        $expected = $fnExpected('<table class="classname" id="#idname">');
+        $expected = $fnExpected('<table class="classname" id="idname">');
         $this->assertEquals($expected, $df->toHTML([
             'class' => 'classname',
             'id' => 'idname',
@@ -125,14 +125,13 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         preg_match_all('/#\w*/', $actual, $matches);
         $matches = current($matches);
         $this->assertTrue(isset($matches[0]));
-        $this->assertTrue(isset($matches[1]));
-        $this->assertTrue($matches[0] === $matches[1]);
 
-        $expected = "<table id='".$matches[0]."'>";
+        $uuid = substr($matches[0], 1);
+        $expected = "<table id='".$uuid."'>";
         $expected .= "<thead><tr><th>a</th></tr></thead>";
         $expected .= "<tfoot><tr><th>a</th></tr></tfoot>";
         $expected .= "<tbody>";
-        $expected .= "<tr><th>1</th></tr>";
+        $expected .= "<tr><td>1</td></tr>";
         $expected .= "</tbody>";
         $expected .= "</table>";
 
@@ -144,7 +143,7 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         };
 
         $scriptTag = $wrap('<script>', '</script>');
-        $expected .= $scriptTag('$(document).ready(function() {$(\''.$matches[1].'\').DataTable();});');
+        $expected .= $scriptTag('$(document).ready(function() {$(\''.$matches[0].'\').DataTable();});');
 
         $this->assertEquals($expected, $actual);
     }
@@ -154,15 +153,15 @@ class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
         $df = DataFrame::fromArray([['a' => 1]]);
 
         $actual = $df->toHTML([
-            'id' => '#myid',
+            'id' => 'myid',
             'datatable' => '{ "key": value }',
         ]);
 
-        $expected = "<table id='#myid'>";
+        $expected = "<table id='myid'>";
         $expected .= "<thead><tr><th>a</th></tr></thead>";
         $expected .= "<tfoot><tr><th>a</th></tr></tfoot>";
         $expected .= "<tbody>";
-        $expected .= "<tr><th>1</th></tr>";
+        $expected .= "<tr><td>1</td></tr>";
         $expected .= "</tbody>";
         $expected .= "</table>";
 

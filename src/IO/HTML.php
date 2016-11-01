@@ -32,7 +32,9 @@ final class HTML
         'class' => null,
         'id' => null,
         'quote' => "'",
-        'datatable' => null
+        'datatable' => null,
+        'colorColumns' => null,
+        'limit' => 5000
     ];
 
     public function __construct(array $data)
@@ -65,17 +67,15 @@ final class HTML
         $quoteOpt = $options['quote'];
         $datatableOpt = $options['datatable'];
 
+        $colorColumnsOpt = $options['colorColumns'];
+        $limitOpt = $options['limit'];
+
         $columns = current($data);
         $columns = array_keys($columns);
 
         // Create a uuid HTML id if user wants a datatable but hasn't provided an HTML id
         if ($datatableOpt !== null and $idOpt === null) {
-            $idOpt = '#'.uniqid();
-        }
-
-        // Prepend hash to HTML id if user failed to include it with their id
-        if ($idOpt !== null and substr($idOpt, 0, 1) !== '#') {
-            $idOpt = '#'.$idOpt;
+            $idOpt = uniqid();
         }
 
         $table = $this->assembleOpeningTableTag($classOpt, $idOpt, $quoteOpt);
@@ -85,11 +85,21 @@ final class HTML
         $fnTBody = $this->fnWrapText('<tbody>', '</tbody>');
 
         $fnTRTH = $this->fnWrapArray('<tr><th>', '</th><th>', '</th></tr>');
+        $fnTR = $this->fnWrapText('<tr>', '</tr>');
 
         $columns = $fnTRTH($columns);
 
+        if ($limitOpt > 0 and $limitOpt < count($data)) {
+            $data = array_slice($data, 0, $limitOpt);
+        }
+
         foreach ($data as &$row) {
-            $row = $fnTRTH($row);
+            foreach ($row as $i => &$col) {
+                $opt = $colorColumnsOpt[$i] ?? '';
+                $opt = $opt !== '' ? " bgcolor='{$opt}'" : '';
+                $col = "<td{$opt}>{$col}</td>";
+            }
+            $row = $fnTR($row);
         }
 
         $data = $fnTable(
@@ -98,7 +108,7 @@ final class HTML
             $fnTBody($data)
         );
 
-        if ($datatableOpt !== null) {
+        if ($datatableOpt !== null and $datatableOpt !== false) {
             $data .= $this->assembleDataTableScript($datatableOpt, $idOpt, $quoteOpt);
         }
 
@@ -157,7 +167,7 @@ final class HTML
         $fnDocumentReady = $this->fnWrapText('$(document).ready(function() {', '});');
         $fnQuoted = $this->fnWrapText($quoteOpt, $quoteOpt);
 
-        $datatableID = $fnQuoted($idOpt);
+        $datatableID = $fnQuoted('#'.$idOpt);
         $jQueryFunction = $fnDocumentReady("$(".$datatableID.").DataTable(".$datatableOpt.");");
         $datatableScript = $fnScript($jQueryFunction);
 
