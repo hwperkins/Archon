@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 
 /**
  * The SQL class contains implementation details for reading and writing data to and from relational databases.
@@ -90,7 +91,7 @@ final class SQL
         $pdo->beginTransaction();
         try {
             $data = array_chunk($data, $chunksizeOpt);
-            $affected = $this->insertChunkedData($pdo, $tableName, $columns, $data);
+            $affected = $this->insertChunkedData($pdo, $tableName, $columns, $data, $options);
         } catch (PDOException $e) {
             $pdo->rollBack();
             throw $e;
@@ -108,14 +109,15 @@ final class SQL
      * @param  $tableName
      * @param  array $columns
      * @param  array $data
+     * @param array $options
      * @return int
      * @since  0.2.0
      */
-    private function insertChunkedData(PDO $pdo, $tableName, array $columns, array $data)
+    private function insertChunkedData(PDO $pdo, $tableName, array $columns, array $data, array $options)
     {
         $affected = 0;
         foreach ($data as $chunk) {
-            $sql = $this->createPreparedStatement($tableName, $columns, $chunk);
+            $sql = $this->createPreparedStatement($tableName, $columns, $chunk, $options);
             $stmt = $pdo->prepare($sql);
             $chunk = $this->flattenArray($chunk);
             $stmt->execute($chunk);
@@ -131,11 +133,19 @@ final class SQL
      * @param  $tableName
      * @param  array $columns
      * @param  array $data
+     * @param array $options
      * @return string
      * @since  0.2.0
      */
-    private function createPreparedStatement($tableName, array $columns, array $data)
+    private function createPreparedStatement($tableName, array $columns, array $data, array $options)
     {
+        $replace_opt = $options['replace'];
+        $ignore_opt = $options['ignore'];
+
+        if ($replace_opt === true and $ignore_opt === true) {
+            throw new RuntimeException("REPLACE and INSERT IGNORE are mutually exclusive. Please choose only one.");
+        }
+
         $columns = '('.implode(', ', $columns).')';
 
         foreach ($data as &$row) {
@@ -144,7 +154,15 @@ final class SQL
         }
         $data = implode(', ', $data);
 
-        return sprintf("INSERT INTO %s %s VALUES %s;", $tableName, $columns, $data);
+        if ($replace_opt === true) {
+            $insert = 'REPLACE';
+        } elseif ($ignore_opt === true) {
+            $insert = 'INSERT IGNORE';
+        } else {
+            $insert = 'INSERT';
+        }
+
+        return "{$insert} INTO {$tableName} {$columns} VALUES {$data};";
     }
 
     /**
