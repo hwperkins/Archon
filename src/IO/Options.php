@@ -36,18 +36,25 @@ final class Options
     public static function setDefaultOptions(array $userOptions, array $defaultOptions)
     {
         /*
-            * First, override all default options with whatever ones have been
-            * user-specified.
-        */
+         * First, override all default options with whatever ones have been
+         * user-specified.
+         */
 
+        $unknownOptions = [];
         foreach ($userOptions as $optionName => $optionValue) {
             // Check if user provided any invalid options.
             if (array_key_exists($optionName, $defaultOptions) === false) {
-                throw new UnknownOptionException('Unknown option: '.$optionName);
+                $unknownOptions[] = $optionName;
+                continue;
+            } else {
+                // Otherwise override the default value for that option.
+                $defaultOptions[$optionName] = $optionValue;
             }
+        }
 
-            // Otherwise override the default value for that option.
-            $defaultOptions[$optionName] = $optionValue;
+        if (count($unknownOptions) > 0) {
+            $unknownOptions = implode(', ', $unknownOptions);
+            throw new UnknownOptionException('Unknown options: ['.$unknownOptions.']');
         }
 
         /*
