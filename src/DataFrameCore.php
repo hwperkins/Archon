@@ -16,9 +16,12 @@ use Archon\Exceptions\DataFrameException;
 use Archon\Exceptions\InvalidColumnException;
 use Closure;
 use Countable;
+use DateTime;
+use Exception;
 use Iterator;
 use ArrayAccess;
 use PDO;
+use RuntimeException;
 
 /**
  * The DataFrameCore class acts as the implementation for the various data manipulation features of the DataFrame class.
@@ -224,6 +227,142 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         foreach($this->data as &$row) {
             $row = preg_replace($pattern, $replacement, $row);
         }
+    }
+
+    /**
+     * Allows user to apply type default values to certain columns when necessary. This is usually utilized
+     * in conjunction with a database to avoid certain invalid type defaults (ie: dates of 0000-00-00).
+     *
+     * ie:
+     *      $df->map_types([
+     *          'some_amount' => 'DECIMAL',
+     *          'some_int'    => 'INT',
+     *          'some_date'   => 'DATE'
+     *      ], ['Y-m-d'], 'm/d/Y');
+     *
+     * @param array $type_map
+     * @param null|string $from_date_format The date format of the input.
+     * @param null|string $to_date_format The date format of the output.
+     * @throws Exception
+     */
+    public function convertTypes(array $type_map, $from_date_format = null, $to_date_format = null) {
+        foreach ($this as $i => $row) {
+            foreach ($type_map as $column => $type) {
+                if ($type == 'DECIMAL') {
+                    $this->data[$i][$column] = $this->convertDecimal($row[$column]);
+                } elseif ($type == 'INT') {
+                    $this->data[$i][$column] = $this->convertInt($row[$column]);
+                } elseif ($type == 'DATE') {
+                    $this->data[$i][$column] = $this->convertDate($row[$column], $from_date_format, $to_date_format);
+                } elseif ($type == 'CURRENCY') {
+                    $this->data[$i][$column] = $this->convertCurrency($row[$column]);
+                } elseif ($type == 'ACCOUNTING') {
+                    $this->data[$i][$column] = $this->convertAccounting($row[$column]);
+                }
+            }
+        }
+    }
+
+    private function convertDecimal($value) {
+        $value = str_replace(['$', ',', ' '], '', $value);
+
+        if (substr($value, 1) == '.') {
+            $value = '0'.$value;
+        }
+
+        if ($value == '0' || $value == '' || $value == '-0.00') {
+            return '0.00';
+        }
+
+        if (substr($value, -1) == '-') {
+            $value = '-'.substr($value, 0, -1);
+        }
+
+        return $value;
+
+    }
+
+    private function convertInt($value) {
+        if ($value === '') {
+            return '0';
+        }
+
+        if (substr($value, -1) === '-') {
+            $value = '-'.substr($value, 0, -1);
+        }
+
+        return str_replace(',', '', $value);
+    }
+
+    private function convertDate($value, $from_format, $to_format) {
+        if ($value === '') {
+            return '0001-01-01';
+        }
+
+        if (is_array($from_format)) {
+            $error_parsing_date = false;
+            $current_format = null;
+
+            foreach ($from_format as $date_format) {
+                $current_format = $date_format;
+                $oldDateTime = DateTime::createFromFormat($date_format, $value);
+                if ($oldDateTime === false) {
+                    $error_parsing_date = true;
+                    continue;
+                } else {
+                    $newDateString = $oldDateTime->format($to_format);
+                    return $newDateString;
+                }
+            }
+
+            if ($error_parsing_date === true) {
+                throw new RuntimeException("Error parsing date string '{$value}' with date format {$current_format}");
+            }
+
+        } else {
+
+            $oldDateTime = DateTime::createFromFormat($from_format, $value);
+            if ($oldDateTime === false) {
+                throw new RuntimeException("Error parsing date string '{$value}' with date format {$from_format}");
+            }
+
+            $newDateString = $oldDateTime->format($to_format);
+            return $newDateString;
+        }
+
+        throw new RuntimeException("Error parsing date string: '{$value}' with date format: {$from_format}");
+    }
+
+    private function convertCurrency($value) {
+        $value = explode('.', $value);
+        $value[1] = $value[1] ?? '00';
+        $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
+        $value[1] = ($value[1] == '' or $value[1] == '0') ? '00' : $value[1];
+
+        $dollars = number_format($value[0]).'.'.$value[1];
+
+        if (substr($dollars, 0, 1) == '-') {
+            $dollars = '-$'.substr($dollars, 1);
+        } else {
+            $dollars = '$'.$dollars;
+        }
+
+        return $dollars;
+    }
+
+    private function convertAccounting($value) {
+        $value = explode('.', $value);
+        $value[1] = $value[1] ?? '00';
+        $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
+        $value[1] = ($value[1] == '' or $value[1] == '0') ? '00' : $value[1];
+
+        $dollars = number_format($value[0]) . '.' . $value[1];
+
+        if (substr($dollars, 0, 1) == '-') {
+            $dollars = '('.substr($dollars, 1).')';
+        }
+
+        return '$'.$dollars;
     }
 
     /* *****************************************************************************************************************
