@@ -313,12 +313,16 @@ $df = DataFrame::fromArray([
     ['a' => 7, 'b' => 8, 'c' => 9],
 ]);
 
-$df = $df->query("SELECT
+$df = $df->query("
+
+SELECT
   a,
   b
 FROM dataframe
 WHERE a = '4'
-  OR b = '2';");
+  OR b = '2';
+
+");
 
 print_r($df->toArray());
 ```
@@ -348,8 +352,12 @@ $df = DataFrame::fromArray([
     ['a' => 7, 'b' => 8, 'c' => 9],
 ]);
 
-$df = $df->query("UPDATE dataframe
-SET a = c * 2;");
+$df = $df->query("
+
+UPDATE dataframe
+SET a = c * 2;
+
+");
 
 print_r($df['a']->to_array());
 ```
