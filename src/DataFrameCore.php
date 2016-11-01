@@ -28,7 +28,7 @@ use ArrayAccess;
  * @link      https://github.com/HWGehring/Archon
  * @since     0.1.0
  */
-class DataFrameCore implements ArrayAccess, Iterator, Countable
+abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 {
 
     /* *****************************************************************************************************************
@@ -69,7 +69,7 @@ class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Applies a user-defined function to each row of the DataFrame. The parameters of the function include the row
      * being iterated over, and optionally the index. ie: apply(function($el, $ix) { ... })
      * @param  Closure $f
-     * @return DataFrame
+     * @return DataFrameCore
      * @since  0.1.0
      */
     public function apply(Closure $f)
