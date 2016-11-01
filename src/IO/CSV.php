@@ -13,6 +13,7 @@
 namespace Archon\IO;
 
 use Archon\Exceptions\FileExistsException;
+use RuntimeException;
 
 /**
  * The CSV class contains implementation details for reading and writing files in the CSV format.
@@ -27,7 +28,7 @@ final class CSV
 {
 
     private $defaultOptions = [
-        'sep' => ',',
+        'sep' => null,
         'nlsep' => "\n",
         'columns' => null,
         'colline' => 0,
@@ -85,6 +86,10 @@ final class CSV
 
         $fileData = $includeRegexOpt ? preg_grep($includeRegexOpt, $fileData) : $fileData;
         $fileData = $excludeRegexOpt ? preg_grep($excludeRegexOpt, $fileData, PREG_GREP_INVERT) : $fileData;
+
+        if ($sepOpt === null) {
+            $sepOpt = self::autoDetectDelimiter($fileData);
+        }
 
         /**
          * Determines how to assign columns of the CSV
@@ -154,6 +159,49 @@ final class CSV
         return $newRow;
     }
 
+    private function autoDetectDelimiter(array $data) {
+        $delimiters = [
+            ',',
+            '\t',
+            ';',
+            '|',
+            ':'
+        ];
+
+        $results = [];
+
+        $row_count = 0;
+        foreach ($data as $row) {
+            $row_count += 1;
+
+            foreach ($delimiters as $delimiter) {
+                $fields = preg_split('/['.$delimiter.']/', $row);
+
+                if (count($fields) > 1) {
+                    $results[$delimiter] = $results[$delimiter] ?? 0;
+                    $results[$delimiter] += 1;
+                }
+            }
+
+            if ($row_count === 5) break;
+        }
+
+        $delimiter = null;
+        $highest_count = 0;
+        foreach ($results as $result => $count) {
+            if ($count > $highest_count) {
+                $highest_count = $count;
+                $delimiter = $result;
+            }
+        }
+
+        if ($delimiter === null) {
+            throw new RuntimeException("Error: Could not auto-detect CSV delimiter. Please specify 'sep' option where loading CSV.");
+        }
+
+        return $delimiter;
+    }
+
     /**
      * Saves the provided two-dimensional array to the file which the CSV class was instantiated with.
      * Options include:
@@ -172,7 +220,7 @@ final class CSV
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
 
         $overwriteOpt = $options['overwrite'];
-        $sepOpt = $options['sep'];
+        $sepOpt = $options['sep'] ?? ',';
         $quoteOpt = $options['quote'];
         $escapeOpt = $options['escape'];
 
