@@ -125,10 +125,7 @@ class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase
             $this->fail("File should exist but does not: {$fileName}");
         }
 
-        $expected = $q.'a'.$q.','.$q.'b'.$q.','.$q.'c'.$q.PHP_EOL;
-        $expected .= $q.'1'.$q.','.$q.'2'.$q.','.$q.'3'.$q.PHP_EOL;
-        $expected .= $q.'4'.$q.','.$q.'5'.$q.','.$q.'6'.$q.PHP_EOL;
-        $expected .= $q.'7'.$q.','.$q.'8'.$q.','.$q.'9'.$q;
+        $expected = "a,b,c\n1,2,3\n4,5,6\n7,8,9\n";
 
         $this->assertEquals($expected, $data);
     }

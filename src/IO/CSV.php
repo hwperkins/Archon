@@ -174,30 +174,21 @@ final class CSV
         $overwriteOpt = $options['overwrite'];
         $sepOpt = $options['sep'];
         $quoteOpt = $options['quote'];
+        $escapeOpt = $options['escape'];
 
         if (file_exists($fileName) and $overwriteOpt === false) {
             throw new FileExistsException("Write failed. File {$fileName} exists.");
         }
 
-        $quoted = function ($elem) use ($quoteOpt) {
-            return $quoteOpt . $elem . $quoteOpt;
-        };
+        $file = fopen($fileName, 'w');
 
-        $header = current($data);
-        $header = array_keys($header);
-        $header = array_map($quoted, $header);
+        $columns = array_keys($data[0]);
+        fputcsv($file, $columns, $sepOpt, $quoteOpt, $escapeOpt);
 
-        $output = [];
-        $output[] = implode($sepOpt, $header);
-
-        foreach ($data as $row) {
-            $row = array_map($quoted, $row);
-            $output[] = implode($sepOpt, $row);
+        foreach($data as $row) {
+            fputcsv($file, $row);
         }
 
-        $output = implode(PHP_EOL, $output);
-
-        file_put_contents($fileName, $output);
-
+        fclose($file);
     }
 }
