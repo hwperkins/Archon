@@ -270,7 +270,7 @@ $df['a'] = $df['c']->apply(function ($el, $key) {
 ```
 
 Applying types:
-```
+```php
 $df = DataFrame::fromArray([
     ['my_date'           => '11/20/16'],
     ['my_other_date'     => '2/12/2016'],
