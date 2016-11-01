@@ -80,8 +80,23 @@ final class FWF
     private function applyColSpecs($data, array $colSpecs)
     {
         $result = [];
+
+        $minCoord = 0;
+        $maxCoord = strlen($data);
+
         foreach ($colSpecs as $colName => $coords) {
-            $result[$colName] = trim(substr($data, $coords[0], $coords[1] - $coords[0]));
+            $leftBound = $coords[0];
+            $rightBound = $coords[1];
+
+            if ($leftBound === '*') {
+                $leftBound = $minCoord;
+            }
+
+            if ($rightBound === '*') {
+                $rightBound = $maxCoord;
+            }
+
+            $result[$colName] = trim(substr($data, $leftBound, $leftBound - $rightBound));
         }
         return $result;
     }
