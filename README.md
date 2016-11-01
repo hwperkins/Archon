@@ -245,6 +245,8 @@ foreach ($df as $i => $row) {
 2: 7-8-9
 ```
 
+## Advanced Operations
+
 Applying functions to rows:
 ```php
 $df = $df->apply(function ($row, $index) {
