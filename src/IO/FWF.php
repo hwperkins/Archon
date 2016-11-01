@@ -81,22 +81,16 @@ final class FWF
     {
         $result = [];
 
-        $minCoord = 0;
-        $maxCoord = strlen($data);
-
         foreach ($colSpecs as $colName => $coords) {
-            $leftBound = $coords[0];
-            $rightBound = $coords[1];
-
-            if ($leftBound === '*') {
-                $leftBound = $minCoord;
+            if ($coords[0] === '*') {
+                $coords[0] = 0;
             }
 
-            if ($rightBound === '*') {
-                $rightBound = $maxCoord;
+            if ($coords[1] === '*') {
+                $coords[1] = strlen($data);
             }
 
-            $result[$colName] = trim(substr($data, $leftBound, $leftBound - $rightBound));
+            $result[$colName] = trim(substr($data, $coords[0], $coords[1] - $coords[0]));
         }
         return $result;
     }
