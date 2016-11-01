@@ -12,6 +12,7 @@
 
 namespace Archon\IO;
 
+use Archon\Exceptions\InvalidColumnException;
 use PDO;
 use PDOException;
 use RecursiveArrayIterator;
@@ -30,7 +31,9 @@ final class SQL
 {
 
     private $defaultOptions = [
-        'chunksize' => 5000
+        'chunksize' => 5000,
+        'replace' => false,
+        'ignore' => false
     ];
 
     public function __construct(PDO $pdo)
@@ -61,21 +64,28 @@ final class SQL
      * @param  array $data
      * @param  array $options
      * @return int
-     * @throws \Archon\Exceptions\UnknownOptionException
+     * @throws InvalidColumnException
      * @since  0.2.0
      */
     public function insertInto($tableName, array $columns, array $data, $options = [])
     {
+        if (count($data) === 0) {
+            return 0;
+        }
+
+        try {
+            $this->identifyAnyMissingColumns($columns, $tableName);
+        } catch (PDOException $pdoe) {
+            // If this function throws a PDO exception then it's probably just a unit test running a SQLite query
+            // SQLite doesn't support "show columns like" syntax
+        } catch (InvalidColumnException $ice) {
+            throw $ice;
+        }
+
         $pdo = $this->pdo;
 
         $options = Options::setDefaultOptions($options, $this->defaultOptions);
         $chunksizeOpt = $options['chunksize'];
-
-        // Sanitize table name and columns
-        $tableName = $pdo->quote($tableName);
-        foreach ($columns as &$column) {
-            $column = $pdo->quote($column);
-        }
 
         $pdo->beginTransaction();
         try {
@@ -109,6 +119,7 @@ final class SQL
             $stmt = $pdo->prepare($sql);
             $chunk = $this->flattenArray($chunk);
             $stmt->execute($chunk);
+            $affected += $stmt->rowCount();
         }
 
         return $affected;
@@ -153,5 +164,24 @@ final class SQL
         }
 
         return $result;
+    }
+
+    /**
+     * Identifies any missing columns in the database which we may be attempting to insert.
+     *
+     * @param array $columns
+     * @param $tableName
+     * @throws InvalidColumnException
+     */
+    private function identifyAnyMissingColumns(array $columns, $tableName) {
+        $db_columns = array_column($this->pdo->query("SHOW COLUMNS FROM {$tableName};")->fetchAll(), 'Field');
+
+        $missingColumns = array_diff($columns, $db_columns);
+
+        if (count($missingColumns) !== 0) {
+            $s = count($missingColumns) > 1 ? 's' : '';
+            $missingColumns = "`".implode("`, `", $missingColumns)."`";
+            throw new InvalidColumnException("Error: Table {$tableName} does not contain the column{$s}: {$missingColumns}.");
+        }
     }
 }
