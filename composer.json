@@ -6,7 +6,7 @@
   "type": "library",
   "license": "BSD-3-Clause",
   "require": {
-    "php": ">=5.5",
+    "php": ">=7.0",
     "ext-mbstring": "*",
     "ext-pdo_sqlite": "*",
     "phpoffice/phpexcel": "1.8.1",
