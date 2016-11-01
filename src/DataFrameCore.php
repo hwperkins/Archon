@@ -207,7 +207,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         if ($rightHandSide instanceof DataFrame) {
             $this->offsetSetDataFrame($targetColumn, $rightHandSide);
-        } elseif ($rightHandSide instanceof Closure) {
+        } else if ($rightHandSide instanceof Closure) {
             $this->offsetSetClosure($targetColumn, $rightHandSide);
         } else {
             $this->offsetSetValue($targetColumn, $rightHandSide);
