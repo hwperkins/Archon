@@ -105,9 +105,10 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * @return DataFrame
      * @throws DataFrameException
      */
-    public function query($sql, PDO $pdo = null) {
+    public function query($sql, PDO $pdo = null)
+    {
         $sql = trim($sql);
-        $query_type = trim(strtoupper(strtok($sql, ' ')));
+        $queryType = trim(strtoupper(strtok($sql, ' ')));
 
         if ($pdo === null) {
             $pdo = new PDO('sqlite::memory:');
@@ -115,20 +116,20 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'sqlite') {
-            $sql_columns = implode(', ', $this->columns);
+            $sqlColumns = implode(', ', $this->columns);
         } elseif ($driver === 'mysql') {
-            $sql_columns = implode(' VARCHAR(255), ', $this->columns) . ' VARCHAR(255)';
+            $sqlColumns = implode(' VARCHAR(255), ', $this->columns) . ' VARCHAR(255)';
         } else {
             throw new DataFrameException("{$driver} is not yet supported for DataFrame query.");
         }
 
         $pdo->exec("DROP TABLE IF EXISTS dataframe;");
-        $pdo->exec("CREATE TABLE IF NOT EXISTS dataframe ({$sql_columns});");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dataframe ({$sqlColumns});");
 
         $df = DataFrame::fromArray($this->data);
         $df->toSQL('dataframe', $pdo);
 
-        if ($query_type === 'SELECT') {
+        if ($queryType === 'SELECT') {
             $result = $pdo->query($sql, PDO::FETCH_ASSOC);
         } else {
             $pdo->exec($sql);
@@ -199,7 +200,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * @param $other
      * @return $this
      */
-    public function append(DataFrame $other) {
+    public function append(DataFrame $other)
+    {
         if (count($other) <= 0) {
             return $this;
         }
@@ -207,12 +209,12 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $columns = $this->columns;
 
         foreach ($other as $row) {
-            $new_row = [];
+            $newRow = [];
             foreach ($columns as $column) {
-                $new_row[$column] = $row[$column];
+                $newRow[$column] = $row[$column];
             }
 
-            $this->data[] = $new_row;
+            $this->data[] = $newRow;
         }
 
         return $this;
@@ -223,7 +225,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * @param $pattern
      * @param $replacement
      */
-    public function pregReplace($pattern, $replacement) {
+    public function pregReplace($pattern, $replacement)
+    {
         foreach($this->data as &$row) {
             $row = preg_replace($pattern, $replacement, $row);
         }
@@ -234,26 +237,27 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * in conjunction with a database to avoid certain invalid type defaults (ie: dates of 0000-00-00).
      *
      * ie:
-     *      $df->map_types([
+     *      $df->mapTypes([
      *          'some_amount' => 'DECIMAL',
      *          'some_int'    => 'INT',
      *          'some_date'   => 'DATE'
      *      ], ['Y-m-d'], 'm/d/Y');
      *
-     * @param array $type_map
-     * @param null|string $from_date_format The date format of the input.
-     * @param null|string $to_date_format The date format of the output.
+     * @param array $typeMap
+     * @param null|string $fromDateFormat The date format of the input.
+     * @param null|string $toDateFormat The date format of the output.
      * @throws Exception
      */
-    public function convertTypes(array $type_map, $from_date_format = null, $to_date_format = null) {
+    public function convertTypes(array $typeMap, $fromDateFormat = null, $toDateFormat = null)
+    {
         foreach ($this as $i => $row) {
-            foreach ($type_map as $column => $type) {
+            foreach ($typeMap as $column => $type) {
                 if ($type == 'DECIMAL') {
                     $this->data[$i][$column] = $this->convertDecimal($row[$column]);
                 } elseif ($type == 'INT') {
                     $this->data[$i][$column] = $this->convertInt($row[$column]);
                 } elseif ($type == 'DATE') {
-                    $this->data[$i][$column] = $this->convertDate($row[$column], $from_date_format, $to_date_format);
+                    $this->data[$i][$column] = $this->convertDate($row[$column], $fromDateFormat, $toDateFormat);
                 } elseif ($type == 'CURRENCY') {
                     $this->data[$i][$column] = $this->convertCurrency($row[$column]);
                 } elseif ($type == 'ACCOUNTING') {
@@ -263,7 +267,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
-    private function convertDecimal($value) {
+    private function convertDecimal($value)
+    {
         $value = str_replace(['$', ',', ' '], '', $value);
 
         if (substr($value, 1) == '.') {
@@ -282,7 +287,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     }
 
-    private function convertInt($value) {
+    private function convertInt($value)
+    {
         if ($value === '') {
             return '0';
         }
@@ -294,46 +300,48 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return str_replace(',', '', $value);
     }
 
-    private function convertDate($value, $from_format, $to_format) {
+    private function convertDate($value, $fromFormat, $toFormat)
+    {
         if ($value === '') {
             return '0001-01-01';
         }
 
-        if (is_array($from_format)) {
-            $error_parsing_date = false;
-            $current_format = null;
+        if (is_array($fromFormat)) {
+            $errorParsingDate = false;
+            $currentFormat = null;
 
-            foreach ($from_format as $date_format) {
-                $current_format = $date_format;
-                $oldDateTime = DateTime::createFromFormat($date_format, $value);
+            foreach ($fromFormat as $dateFormat) {
+                $currentFormat = $dateFormat;
+                $oldDateTime = DateTime::createFromFormat($dateFormat, $value);
                 if ($oldDateTime === false) {
-                    $error_parsing_date = true;
+                    $errorParsingDate = true;
                     continue;
                 } else {
-                    $newDateString = $oldDateTime->format($to_format);
+                    $newDateString = $oldDateTime->format($toFormat);
                     return $newDateString;
                 }
             }
 
-            if ($error_parsing_date === true) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$current_format}");
+            if ($errorParsingDate === true) {
+                throw new RuntimeException("Error parsing date string '{$value}' with date format {$currentFormat}");
             }
 
         } else {
 
-            $oldDateTime = DateTime::createFromFormat($from_format, $value);
+            $oldDateTime = DateTime::createFromFormat($fromFormat, $value);
             if ($oldDateTime === false) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$from_format}");
+                throw new RuntimeException("Error parsing date string '{$value}' with date format {$fromFormat}");
             }
 
-            $newDateString = $oldDateTime->format($to_format);
+            $newDateString = $oldDateTime->format($toFormat);
             return $newDateString;
         }
 
-        throw new RuntimeException("Error parsing date string: '{$value}' with date format: {$from_format}");
+        throw new RuntimeException("Error parsing date string: '{$value}' with date format: {$fromFormat}");
     }
 
-    private function convertCurrency($value) {
+    private function convertCurrency($value)
+    {
         $value = explode('.', $value);
         $value[1] = $value[1] ?? '00';
         $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
@@ -350,7 +358,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return $dollars;
     }
 
-    private function convertAccounting($value) {
+    private function convertAccounting($value)
+    {
         $value = explode('.', $value);
         $value[1] = $value[1] ?? '00';
         $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
@@ -363,6 +372,39 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
 
         return '$'.$dollars;
+    }
+
+    /**
+     * Will group data similar to a SQL group by.
+     *
+     * @param $columns
+     * @return DataFrame
+     */
+    public function groupBy($columns)
+    {
+        $groupedData = [];
+
+        $uniqueColumns = [];
+        foreach($this->data as $row) {
+
+            if (is_array($columns)) {
+                $uniqueData = null;
+                foreach ($columns as $column) {
+                    $uniqueData .= $row[$column];
+                }
+            } else {
+                $uniqueData = $row[$columns];
+            }
+
+            if (isset($uniqueColumns[$uniqueData])) {
+                continue;
+            } else {
+                $uniqueColumns[$uniqueData] = true;
+                $groupedData[] = $row;
+            }
+        }
+
+        return DataFrame::fromArray($groupedData);
     }
 
     /* *****************************************************************************************************************
