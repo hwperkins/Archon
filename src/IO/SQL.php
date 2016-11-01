@@ -139,10 +139,10 @@ final class SQL
      */
     private function createPreparedStatement($tableName, array $columns, array $data, array $options)
     {
-        $replace_opt = $options['replace'];
-        $ignore_opt = $options['ignore'];
+        $replaceOpt = $options['replace'];
+        $ignoreOpt = $options['ignore'];
 
-        if ($replace_opt === true and $ignore_opt === true) {
+        if ($replaceOpt === true and $ignoreOpt === true) {
             throw new RuntimeException("REPLACE and INSERT IGNORE are mutually exclusive. Please choose only one.");
         }
 
@@ -154,9 +154,9 @@ final class SQL
         }
         $data = implode(', ', $data);
 
-        if ($replace_opt === true) {
+        if ($replaceOpt === true) {
             $insert = 'REPLACE';
-        } else if ($ignore_opt === true) {
+        } else if ($ignoreOpt === true) {
             $insert = 'INSERT IGNORE';
         } else {
             $insert = 'INSERT';
