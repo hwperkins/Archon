@@ -215,6 +215,17 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return $this;
     }
 
+    /**
+     * Replaces all occurences within the DataFrame of regex $pattern with string $replacement
+     * @param $pattern
+     * @param $replacement
+     */
+    public function pregReplace($pattern, $replacement) {
+        foreach($this->data as &$row) {
+            $row = preg_replace($pattern, $replacement, $row);
+        }
+    }
+
     /* *****************************************************************************************************************
      ******************************************* ArrayAccess Implementation ********************************************
      ******************************************************************************************************************/
