@@ -6,21 +6,6 @@ use Archon\IO\FileStream;
 class FileStreamUnitTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testFromCSV()
-    {
-        $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSV.csv';
-        $file = new \SplFileInfo($fileName);
-        $fs = new FileStream($file);
-
-        $gen = $fs->generator();
-
-        foreach ($fs->apply(function ($line, $i) {
-            echo $i . ': ' . $line . PHP_EOL;
-        }) as $line) {
-
-        }
-    }
-
     public function testFromCSVDirty()
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVdirty.csv';
