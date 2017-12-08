@@ -95,6 +95,19 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return $this;
     }
 
+
+    /**
+     * Filter DataFrame rows using user-defined function. The parameters of the function include the row
+     * being iterated over, and the index. ie: filter(function($row, $index) { ... })
+     * @param  Closure $f
+     * @return DataFrameCore
+     * @since  0.1.0
+     */
+    public function filter(Closure $f)
+    {
+        return DataFrame::fromArray(array_filter($this->data, $f, ARRAY_FILTER_USE_BOTH));
+    }
+    
     /**
      * Allows SQL to be used to perform operations on the DataFrame
      *
