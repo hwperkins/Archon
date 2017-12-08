@@ -184,6 +184,19 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+        /**
+     * Adds multiple columns to the DataFrame.
+     * @internal
+     * @param $columnNames
+     * @since 1.0.1
+     */
+
+    private function addColumns($columnNames)
+    {
+        foreach($columnNames as $columnName){
+            $this->addColumn($columnName);
+        }
+    }
     /**
      * Renames specific column.
      *
