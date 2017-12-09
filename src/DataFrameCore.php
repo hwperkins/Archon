@@ -95,7 +95,22 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return $this;
     }
 
-
+    /**
+     * Apply new values to specific rows of the DataFrame using row index.
+     * applyByIndex([2=>'F',3=>'M','5'=>'F'], 'gender');
+     * @param  Array $values
+     * @param  $column
+     * @return DataFrameCore
+     * @since  0.1.0
+     */
+    public function applyByIndex(array $values, $column)
+    {
+        $this->mustHaveColumn($column);
+        foreach($values as $index => $value){
+          $this->data[$index][$column] = $value;
+        }
+        return $this;
+    }
     /**
      * Filter DataFrame rows using user-defined function. The parameters of the function include the row
      * being iterated over, and the index. ie: filter(function($row, $index) { ... })
