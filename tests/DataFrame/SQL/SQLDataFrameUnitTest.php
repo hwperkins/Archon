@@ -41,4 +41,26 @@ class SQLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $df->toArray());
     }
+
+    public function testGroupBySqLite() {
+
+        $df = DataFrame::fromArray(array(
+            array( 'a' => 'foo', 'b' => 2 ),
+            array( 'a' => 'foo', 'b' => 2 ),
+            array( 'a' => 'bar', 'b' => 2 ),
+            array( 'a' => 'bar', 'b' => 2 ),
+            array( 'a' => 'baz', 'b' => 2 ),
+            array( 'a' => 'baz', 'b' => 2 ),
+        ));
+
+        $expected = array(
+            array( 'a' => 'foo', 'b' => 4 ),
+            array( 'a' => 'bar', 'b' => 4 ),
+            array( 'a' => 'baz', 'b' => 4 ),
+        );
+
+        $actual = $df->query("SELECT a, sum(b) AS b FROM dataframe GROUP BY 1 ORDER BY 2 DESC")->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
 }
