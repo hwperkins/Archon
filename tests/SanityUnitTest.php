@@ -1,6 +1,8 @@
-<?php namespace Archon\Test;
+<?php namespace Archon\Tests;
 
-class SanityUnitTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class SanityUnitTest extends TestCase
 {
 
     public function testSanity()

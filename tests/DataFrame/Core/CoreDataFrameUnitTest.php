@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\Core;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class CoreDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class CoreDataFrameUnitTest extends TestCase
 {
 
     /**

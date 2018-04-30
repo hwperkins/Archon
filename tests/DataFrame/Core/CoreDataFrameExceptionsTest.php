@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\Core;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class CoreDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
+class CoreDataFrameExceptionsTest extends TestCase
 {
 
     public function setUp()
@@ -18,13 +19,13 @@ class CoreDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidColumn()
     {
-        $this->setExpectedException('Archon\Exceptions\InvalidColumnException');
+        $this->expectException('Archon\Exceptions\InvalidColumnException');
         $this->df['foo'];
     }
 
     public function testRemoveNonExistentColumn()
     {
-        $this->setExpectedException('Archon\Exceptions\DataFrameException');
+        $this->expectException('Archon\Exceptions\DataFrameException');
         $this->df->removeColumn('foo');
     }
 
@@ -32,7 +33,7 @@ class CoreDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
     {
         $df = $this->df;
 
-        $this->setExpectedException('Archon\Exceptions\DataFrameException');
+        $this->expectException('Archon\Exceptions\DataFrameException');
         $df['foo'] = $df;
     }
 
@@ -41,7 +42,7 @@ class CoreDataFrameExceptionsTest extends \PHPUnit_Framework_TestCase
         $df = $this->df;
         $df2 = DataFrame::fromArray([['a' => 1, 'b' => 2, 'c' => 3]]);
 
-        $this->setExpectedException('Archon\Exceptions\DataFrameException');
+        $this->expectException('Archon\Exceptions\DataFrameException');
         $df['a'] = $df2['a'];
     }
 }

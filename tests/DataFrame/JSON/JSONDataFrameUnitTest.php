@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\HTML;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class JSONDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class JSONDataFrameUnitTest extends TestCase
 {
 
     public function testToJSON()

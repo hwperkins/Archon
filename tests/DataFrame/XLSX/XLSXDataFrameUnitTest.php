@@ -3,8 +3,9 @@
 use Archon\DataFrame;
 use PHPExcel;
 use PHPExcel_Writer_Excel2007;
+use PHPUnit\Framework\TestCase;
 
-class XLSXDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class XLSXDataFrameUnitTest extends TestCase
 {
 
     public function testLoadXLSX()

@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\FWF;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class FWFDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class FWFDataFrameUnitTest extends TestCase
 {
 
     public function testLoadFWF1()

@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\HTML;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class HTMLDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class HTMLDataFrameUnitTest extends TestCase
 {
 
     public function testToHTML()
