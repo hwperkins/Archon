@@ -238,7 +238,7 @@ class CoreDataFrameUnitTest extends TestCase
     public function testFilter() {
         $df = $this->df;
 
-        $df = $df->filter(function($row) {
+        $df = $df->array_filter(function($row) {
             return $row['a'] > 4 || $row['a'] < 4;
         });
 

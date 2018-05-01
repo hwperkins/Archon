@@ -146,13 +146,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * being iterated over, and the index.
      *
      * ie:
-     *      $df = $df->filter(function($row, $index) { ... });
+     *      $df = $df->array_filter(function($row, $index) { ... });
      *
      * @param  Closure $f
      * @return DataFrame
      * @since  0.1.0
      */
-    public function filter(Closure $f)
+    public function array_filter(Closure $f)
     {
         return DataFrame::fromArray(array_filter($this->data, $f, ARRAY_FILTER_USE_BOTH));
     }
