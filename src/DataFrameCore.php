@@ -212,19 +212,20 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
-        /**
+    /**
      * Adds multiple columns to the DataFrame.
+     *
      * @internal
      * @param $columnNames
      * @since 1.0.1
      */
-
     private function addColumns($columnNames)
     {
-        foreach($columnNames as $columnName){
+        foreach($columnNames as $columnName) {
             $this->addColumn($columnName);
         }
     }
+
     /**
      * Renames specific column.
      *
@@ -234,7 +235,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * @param $from
      * @param $to
      */
-    public function renameColumn($from, $to) {
+    public function renameColumn($from, $to)
+    {
         $this->mustHaveColumn($from);
 
         foreach ($this as $i => $row) {
@@ -245,6 +247,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
 
         $key = array_search($from, $this->columns);
+
         if(($key) !== false) {
             $this->columns[$key] = $to;
         }
@@ -607,13 +610,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     private function offsetSetValue($targetColumn, $value)
     {
-        if(trim($targetColumn!='')){
+        if (trim($targetColumn != '')) {
           $this->addColumn($targetColumn);
           foreach ($this as $i => $row) {
               $this->data[$i][$targetColumn] = $value;
           }
-        }elseif(is_array($value)){
-          foreach($value as $row){
+        } elseif (is_array($value)) {
+          foreach ($value as $row) {
             $this->addColumns(array_keys($row));
             $this->data[] = $row;
           }
