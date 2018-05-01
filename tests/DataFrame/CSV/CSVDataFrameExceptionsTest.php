@@ -2,8 +2,9 @@
 
 use Archon\DataFrame;
 use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
+class CSVDataFrameExceptionsTest extends TestCase
 {
 
     public function testOverwriteFailCSV()
@@ -16,7 +17,7 @@ class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
             ['a' => 7, 'b' => 8, 'c' => 9],
         ]);
 
-        $this->setExpectedException('Archon\Exceptions\FileExistsException');
+        $this->expectException('Archon\Exceptions\FileExistsException');
         $df->toCSV($fileName);
     }
 
@@ -24,7 +25,7 @@ class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVOverwrite.csv';
 
-        $this->setExpectedException('Archon\Exceptions\UnknownOptionException');
+        $this->expectException('Archon\Exceptions\UnknownOptionException');
         DataFrame::fromCSV($fileName, ['invalid_option' => 0]);
 
     }
@@ -33,7 +34,7 @@ class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVUnknownDelimiter.csv';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         DataFrame::fromCSV($fileName);
     }
 
@@ -41,7 +42,7 @@ class CSVDataFrameExceptionsTest extends PHPUnit_Framework_TestCase
     {
         $fileName = __DIR__.DIRECTORY_SEPARATOR.'TestFiles'.DIRECTORY_SEPARATOR.'testCSVInvalidColumnCount.csv';
 
-        $this->setExpectedException('Archon\Exceptions\InvalidColumnException');
+        $this->expectException('Archon\Exceptions\InvalidColumnException');
         DataFrame::fromCSV($fileName);
     }
 

@@ -15,7 +15,7 @@
 
  <filter>
   <whitelist addUncoveredFilesFromWhitelist="true">
-   <directory suffix=".php">../lib</directory>
+   <directory suffix=".php">../src</directory>
    <exclude>
     <file>../vendor/autoload.php</file>
    </exclude>

@@ -3,8 +3,9 @@
 use Archon\DataFrame;
 use PDO;
 use PDOException;
+use PHPUnit\Framework\TestCase;
 
-class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
+class SQLDataFrameExceptionTest extends TestCase
 {
 
     public function testRollback()
@@ -42,7 +43,7 @@ class SQLDataFrameExceptionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         try {
-            $this->setExpectedException('PDOException');
+            $this->expectException('PDOException');
             $bad->toSQL('testTable', $pdo, ['chunksize' => 1]);
         } catch (PDOException $e) {
             /*

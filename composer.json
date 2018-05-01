@@ -6,14 +6,14 @@
   "type": "library",
   "license": "BSD-3-Clause",
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.1",
     "ext-mbstring": "*",
     "ext-pdo_sqlite": "*",
     "phpoffice/phpexcel": "1.8.1",
     "gajus/dindent": "2.0.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "4.7.*",
+    "phpunit/phpunit": "^7.0",
     "phpmd/phpmd" : "@stable",
     "squizlabs/php_codesniffer": "2.3.4",
     "satooshi/php-coveralls": "0.6.1"

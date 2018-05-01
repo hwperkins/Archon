@@ -1,8 +1,9 @@
 <?php namespace Archon\Tests\DataFrame\CSV;
 
 use Archon\DataFrame;
+use PHPUnit\Framework\TestCase;
 
-class CSVDataFrameUnitTest extends \PHPUnit_Framework_TestCase
+class CSVDataFrameUnitTest extends TestCase
 {
 
     public function testFromCSV()
