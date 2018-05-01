@@ -328,7 +328,18 @@ class CoreDataFrameUnitTest extends TestCase
             [ 'a' => 3, 'b' => 5, 'c' => 7 ],
             [ 'a' => 3, 'b' => 5, 'c' => 8 ],
         ], $df->unique(['a', 'b', 'c'])->toArray());
-
-
     }
+
+    public function testRename() {
+        $df = $this->df;
+
+        $df->renameColumn('a', 'foo');
+
+        $this->assertSame([
+            ['foo' => 1, 'b' => 2, 'c' => 3],
+            ['foo' => 4, 'b' => 5, 'c' => 6],
+            ['foo' => 7, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
 }
