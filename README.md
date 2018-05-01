@@ -18,13 +18,13 @@ composer require archon/dataframe
 ```json
 {
     "require": {
-        "archon/dataframe": "1.0.0"
+        "archon/dataframe": "1.1.0"
     }
 }
 ```
 
 ### Requirements
- - PHP 5.5 or higher
+ - PHP 7.1 or higher
  - php_pdo_sqlite extension
  - php_mbstring extension
  
