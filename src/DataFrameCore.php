@@ -98,7 +98,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Apply new values to specific rows of the DataFrame using row index.
      * applyByIndex([2=>'F',3=>'M','5'=>'F'], 'gender');
-     * @param  Array $values
+     *
+     * @param  array $values
      * @param  $column
      * @return DataFrameCore
      * @since  0.1.0
@@ -114,6 +115,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Filter DataFrame rows using user-defined function. The parameters of the function include the row
      * being iterated over, and the index. ie: filter(function($row, $index) { ... })
+     *
      * @param  Closure $f
      * @return DataFrameCore
      * @since  0.1.0
@@ -173,6 +175,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Assertion that the DataFrame must have the column specified. If not then an exception is thrown.
+     *
      * @param  $columnName
      * @throws InvalidColumnException
      * @since  0.1.0
@@ -186,6 +189,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Returns a boolean of whether the specified column exists.
+     *
      * @param  $columnName
      * @return bool
      * @since  0.1.0
@@ -201,6 +205,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Adds a new column to the DataFrame.
+     *
      * @internal
      * @param $columnName
      * @since 0.1.0
@@ -255,6 +260,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Removes a column (and all associated data) from the DataFrame.
+     *
      * @param $columnName
      * @since 0.1.0
      */
@@ -291,6 +297,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Replaces all occurences within the DataFrame of regex $pattern with string $replacement
+     *
      * @param $pattern
      * @param $replacement
      */
@@ -482,6 +489,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Provides isset($df['column']) functionality.
+     *
      * @internal
      * @param  mixed $columnName
      * @return bool
@@ -502,6 +510,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user retrieve DataFrame subsets from a two-dimensional array by
      * simply requesting an element of the instantiated DataFrame.
      *      ie: $fooDF = $df['foo'];
+     *
      * @internal
      * @param  mixed $columnName
      * @return DataFrame
@@ -534,6 +543,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      *          $df['foo'] = function ($foo) { return $foo + 1; };
      *          $df['foo'] = 'bar';
      *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
+     *
      * @internal
      * @param  mixed $targetColumn
      * @param  mixed $rightHandSide
@@ -555,6 +565,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a single-column DataFrame.
      *      ie:
      *          $df['bar'] = $df['foo'];
+     *
      * @internal
      * @param  $targetColumn
      * @param  DataFrame $df
@@ -586,6 +597,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a Closure.
      *      ie:
      *          $df['foo'] = function ($foo) { return $foo + 1; };
+     *
      * @internal
      * @param $targetColumn
      * @param Closure $f
@@ -603,6 +615,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      *      ie:
      *          $df['foo'] = 'bar';
      *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
+     *
      * @internal
      * @param $targetColumn
      * @param $value
@@ -626,6 +639,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Allows user to remove columns from the DataFrame using unset.
      *      ie: unset($df['column'])
+     *
      * @param  mixed $offset
      * @throws InvalidColumnException
      * @since  0.1.0
@@ -651,6 +665,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Return the current element
+     *
      * @link   http://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since  0.1.0
@@ -662,6 +677,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Move forward to next element
+     *
      * @link   http://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      * @since  0.1.0
@@ -673,6 +689,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Return the key of the current element
+     *
      * @link   http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      * @since  0.1.0
@@ -684,6 +701,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Checks if current position is valid
+     *
      * @link   http://php.net/manual/en/iterator.valid.php
      * @return boolean The return value will be casted to boolean and then evaluated.
      *                 Returns true on success or false on failure.
@@ -696,6 +714,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Rewind the Iterator to the first element
+     *
      * @link   http://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      * @since  0.1.0
@@ -711,6 +730,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Count elements of an object
+     *
      * @link   http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      *             The return value is cast to an integer.
