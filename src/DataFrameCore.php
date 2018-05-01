@@ -472,32 +472,36 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Will group data similar to a SQL group by.
+     * Returns unique values of given column(s)
      *
      * @param $columns
      * @return DataFrame
      */
-    public function groupBy($columns)
+    public function unique($columns)
     {
-        $groupedData = [];
+        if (!is_array($columns)) {
+            $columns = [ $columns ];
+        }
 
+        $groupedData = [];
         $uniqueColumns = [];
         foreach($this->data as $row) {
-
-            if (is_array($columns)) {
-                $uniqueData = null;
-                foreach ($columns as $column) {
-                    $uniqueData .= $row[$column];
-                }
-            } else {
-                $uniqueData = $row[$columns];
+            $uniqueKey = null;
+            foreach ($columns as $column) {
+                $uniqueKey .= $row[$column];
             }
 
-            if (isset($uniqueColumns[$uniqueData])) {
+            if (isset($uniqueColumns[$uniqueKey])) {
                 continue;
             } else {
-                $uniqueColumns[$uniqueData] = true;
-                $groupedData[] = $row;
+                $uniqueColumns[$uniqueKey] = true;
+
+                $new_row = array();
+                foreach ($columns as $column) {
+                    $new_row[$column] = $row[$column];
+                }
+
+                $groupedData[] = $new_row;
             }
         }
 

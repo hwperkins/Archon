@@ -297,4 +297,38 @@ class CoreDataFrameUnitTest extends TestCase
         ], $df1->toArray());
     }
 
+    public function testGroupBy() {
+        $df = DataFrame::fromArray([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 1, 'b' => 3, 'c' => 4 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 5 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 6 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 7 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 8 ],
+        ]);
+
+        $this->assertSame([
+            [ 'a' => 1 ],
+            [ 'a' => 2 ],
+            [ 'a' => 3 ],
+        ], $df->unique('a')->toArray());
+
+        $this->assertSame([
+            [ 'a' => 1, 'b' => 2 ],
+            [ 'a' => 1, 'b' => 3 ],
+            [ 'a' => 2, 'b' => 4 ],
+            [ 'a' => 3, 'b' => 5 ],
+        ], $df->unique(['a', 'b'])->toArray());
+
+        $this->assertSame([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 1, 'b' => 3, 'c' => 4 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 5 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 6 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 7 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 8 ],
+        ], $df->unique(['a', 'b', 'c'])->toArray());
+
+
+    }
 }
