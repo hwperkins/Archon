@@ -99,11 +99,20 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Apply new values to specific rows of the DataFrame using row index.
      *
-     * ie:
-     *      $df->infuseIndexMap('gender', [
-     *          2 => 'F',
-     *          3 => 'M',
-     *          5 => 'F'
+     * If column is supplied, will apply to column.
+     * If column is absent, will apply to row.
+     *
+     * By column:
+     *      $df->applyIndexMap([
+     *          2 => 'foo',
+     *          3 => function($old_value) { return $new_value; },
+     *          5 => 'baz',
+     *      ], 'a');
+     *
+     * By row:
+     *      $df->applyIndexMap([
+     *          2 => function($old_row) { return $new_row; },
+     *          3 => [ 'a' => 1, 'b' => 2, 'c' => 3 ],
      *      ]);
      *
      * @param  array $map keys are row indices, values are static

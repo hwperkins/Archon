@@ -160,10 +160,10 @@ class CoreDataFrameUnitTest extends TestCase
     {
         $df = $this->df;
 
-        $df->applyIndexMap(array(
+        $df->applyIndexMap([
             0 => 0,
             2 => 0,
-        ), 'a');
+        ], 'a');
 
         $this->assertEquals([
             ['a' => 0, 'b' => 2, 'c' => 3],
@@ -176,7 +176,7 @@ class CoreDataFrameUnitTest extends TestCase
     {
         $df = $this->df;
 
-        $df->applyIndexMap(array(
+        $df->applyIndexMap([
             0 => function($row) {
                 $row['a'] = 10;
                 return $row;
@@ -185,7 +185,7 @@ class CoreDataFrameUnitTest extends TestCase
                 $row['c'] = 20;
                 return $row;
             },
-        ));
+        ]);
 
         $this->assertEquals([
             ['a' => 10, 'b' => 2, 'c' => 3],
@@ -208,10 +208,10 @@ class CoreDataFrameUnitTest extends TestCase
             }
         };
 
-        $df->applyIndexMap(array(
+        $df->applyIndexMap([
             0 => $my_function,
             2 => $my_function,
-        ), 'a');
+        ], 'a');
 
         $this->assertEquals([
             ['a' => 0, 'b' => 2, 'c' => 3],
@@ -224,9 +224,9 @@ class CoreDataFrameUnitTest extends TestCase
     {
         $df = $this->df;
 
-        $df->applyIndexMap(array(
-            1 => array( 'a' => 301, 'b' => 404, 'c' => 500 ),
-        ));
+        $df->applyIndexMap([
+            1 => [ 'a' => 301, 'b' => 404, 'c' => 500 ],
+        ]);
 
         $this->assertEquals([
             ['a' => 1, 'b' => 2, 'c' => 3],
@@ -234,8 +234,5 @@ class CoreDataFrameUnitTest extends TestCase
             ['a' => 7, 'b' => 8, 'c' => 9],
         ], $df->toArray());
     }
-
-
-
 
 }
