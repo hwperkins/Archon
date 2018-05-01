@@ -266,6 +266,12 @@ class CoreDataFrameUnitTest extends TestCase
         $df1 = $this->df;
         $df2 = $this->df;
 
+        // Test that appending an array with less than count of 1 will simply return the original DataFrame
+        $this->assertSame(
+            $df1,
+            $df1->append(DataFrame::fromArray(array()))
+        );
+
         $df1->append($df2);
 
         $this->assertEquals([
