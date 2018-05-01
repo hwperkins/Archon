@@ -646,7 +646,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a variable and add new rows to Dataframe
      *      ie:
      *          $df['foo'] = 'bar';
-     *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
+     *
+     *          $df[] = [ 'foo' => 1, 'bar' => 2, 'baz' => 3 ];
      *
      * @internal
      * @param $targetColumn
@@ -656,15 +657,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     private function offsetSetValue($targetColumn, $value)
     {
         if (trim($targetColumn != '')) {
-          $this->addColumn($targetColumn);
-          foreach ($this as $i => $row) {
-              $this->data[$i][$targetColumn] = $value;
-          }
+            $this->addColumn($targetColumn);
+            foreach ($this as $i => $row) {
+                $this->data[$i][$targetColumn] = $value;
+            }
         } elseif (is_array($value)) {
-          foreach ($value as $row) {
-            $this->addColumns(array_keys($row));
-            $this->data[] = $row;
-          }
+            $this->addColumns(array_keys($value));
+            $this->data[] = $value;
         }
     }
 

@@ -235,7 +235,8 @@ class CoreDataFrameUnitTest extends TestCase
         ], $df->toArray());
     }
 
-    public function testFilter() {
+    public function testFilter()
+    {
         $df = $this->df;
 
         $df = $df->array_filter(function($row) {
@@ -245,6 +246,20 @@ class CoreDataFrameUnitTest extends TestCase
         $this->assertEquals([
             [ 'a' => 1, 'b' => 2, 'c' => 3 ],
             [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df->toArray());
+    }
+
+    public function testOffsetSetValueArray()
+    {
+        $df = $this->df;
+
+        $df[] = [ 'a' => 10, 'b' => 11, 'c' => 12 ];
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+            [ 'a' => 10, 'b' => 11, 'c' => 12 ],
         ], $df->toArray());
     }
 }
