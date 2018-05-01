@@ -288,7 +288,7 @@ class CoreDataFrameUnitTest extends TestCase
     {
         $df1 = $this->df;
 
-        $df1->pregReplace('/[1-5]/', 'foo');
+        $df1->preg_replace('/[1-5]/', 'foo');
 
         $this->assertEquals([
             [ 'a' => 'foo', 'b' => 'foo', 'c' => 'foo' ],

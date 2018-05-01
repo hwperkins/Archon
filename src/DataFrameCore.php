@@ -362,12 +362,12 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         foreach ($this as $i => $row) {
             foreach ($typeMap as $column => $type) {
-                if ($type == 'DECIMAL') {
-                    $this->data[$i][$column] = $this->convertDecimal($row[$column]);
-                } elseif ($type == 'INT') {
+                if ($type === DataType::NUMERIC) {
+                    $this->data[$i][$column] = $this->convertNumeric($row[$column]);
+                } elseif ($type === DataType::INTEGER) {
                     $this->data[$i][$column] = $this->convertInt($row[$column]);
-                } elseif ($type == 'DATE') {
-                    $this->data[$i][$column] = $this->convertDate($row[$column], $fromDateFormat, $toDateFormat);
+                } elseif ($type === DataType::DATETIME) {
+                    $this->data[$i][$column] = $this->convertDatetime($row[$column], $fromDateFormat, $toDateFormat);
                 } elseif ($type == 'CURRENCY') {
                     $this->data[$i][$column] = $this->convertCurrency($row[$column]);
                 } elseif ($type == 'ACCOUNTING') {
@@ -377,17 +377,11 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
-    private function convertDecimal($value)
+    private function convertNumeric($value)
     {
+        if (is_numeric($value)) return $value;
+
         $value = str_replace(['$', ',', ' '], '', $value);
-
-        if (substr($value, 1) == '.') {
-            $value = '0'.$value;
-        }
-
-        if ($value == '0' || $value == '' || $value == '-0.00') {
-            return '0.00';
-        }
 
         if (substr($value, -1) == '-') {
             $value = '-'.substr($value, 0, -1);
@@ -399,18 +393,18 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     private function convertInt($value)
     {
-        if ($value === '') {
-            return '0';
-        }
+        if (empty($value)) return 0;
 
         if (substr($value, -1) === '-') {
             $value = '-'.substr($value, 0, -1);
         }
 
-        return str_replace(',', '', $value);
+        $value = str_replace(['$', ',', ' '], '', $value);
+
+        return intval(str_replace(',', '', $value));
     }
 
-    private function convertDate($value, $fromFormat, $toFormat)
+    private function convertDatetime($value, $fromFormat, $toFormat)
     {
         if ($value === '') {
             return '0001-01-01';
