@@ -235,4 +235,16 @@ class CoreDataFrameUnitTest extends TestCase
         ], $df->toArray());
     }
 
+    public function testFilter() {
+        $df = $this->df;
+
+        $df = $df->filter(function($row) {
+            return $row['a'] > 4 || $row['a'] < 4;
+        });
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df->toArray());
+    }
 }
