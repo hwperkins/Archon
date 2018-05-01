@@ -106,6 +106,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     public function applyByIndex(array $values, $column)
     {
+
         $this->mustHaveColumn($column);
         foreach($values as $index => $value){
           $this->data[$index][$column] = $value;
@@ -222,10 +223,10 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Adds multiple columns to the DataFrame.
      *
      * @internal
-     * @param $columnNames
+     * @param array $columnNames
      * @since 1.0.1
      */
-    private function addColumns($columnNames)
+    private function addColumns(array $columnNames)
     {
         foreach($columnNames as $columnName) {
             $this->addColumn($columnName);
