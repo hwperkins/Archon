@@ -283,4 +283,18 @@ class CoreDataFrameUnitTest extends TestCase
             [ 'a' => 7, 'b' => 8, 'c' => 9 ],
         ], $df1->toArray());
     }
+
+    public function testPregReplace()
+    {
+        $df1 = $this->df;
+
+        $df1->pregReplace('/[1-5]/', 'foo');
+
+        $this->assertEquals([
+            [ 'a' => 'foo', 'b' => 'foo', 'c' => 'foo' ],
+            [ 'a' => 'foo', 'b' => 'foo', 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df1->toArray());
+    }
+
 }

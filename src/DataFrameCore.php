@@ -333,12 +333,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      *
      * @param $pattern
      * @param $replacement
+     * @return DataFrameCore
      */
-    public function pregReplace($pattern, $replacement)
+    public function preg_replace($pattern, $replacement)
     {
-        foreach($this->data as &$row) {
-            $row = preg_replace($pattern, $replacement, $row);
-        }
+        return $this->apply(function($row) use ($pattern, $replacement) {
+            return preg_replace($pattern, $replacement, $row);
+        });
     }
 
     /**
