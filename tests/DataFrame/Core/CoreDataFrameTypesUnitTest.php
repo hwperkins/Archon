@@ -38,5 +38,22 @@ class CoreDataFrameTypesUnitTest extends TestCase
         ], $df->toArray());
     }
 
+    public function testConvertDateTime() {
+        $df = DataFrame::fromArray([
+            [ 'datetime' => '12/03/1996' ],
+            [ 'datetime' => '03-2001-04' ],
+            [ 'datetime' => 'Jun 04 2010' ],
+        ]);
+
+        $df->convertTypes([
+            'datetime' => DataType::DATETIME,
+        ], [ 'd/m/Y', 'd-Y-m', 'M d Y' ], 'Y-m-d');
+
+        $this->assertSame([
+            [ 'datetime' => '1996-03-12' ],
+            [ 'datetime' => '2001-04-03' ],
+            [ 'datetime' => '2010-06-04' ],
+        ], $df->toArray());
+    }
 
 }
