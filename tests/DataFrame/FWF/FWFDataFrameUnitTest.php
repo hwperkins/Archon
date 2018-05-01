@@ -20,10 +20,10 @@ abc    qwer   12-34-5678 1234
 xyz    opas   78-90-1234 9012
          */
         $df = DataFrame::fromFWF($fileName, [
-            'col1' => [0, 4],
+            'col1' => ['*', 4],
             'col2' => [7, 11],
             'col3' => [14, 24],
-            'col4' => [25, 29]
+            'col4' => [25, '*']
         ], ['include' => '/^.{14}\d{2}-\d{2}-\d{4}/']);
         $testArr = $df->toArray();
 

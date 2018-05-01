@@ -179,10 +179,12 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'sqlite') {
             $sqlColumns = implode(', ', $this->columns);
+            // @codeCoverageIgnoreStart
         } elseif ($driver === 'mysql') {
             $sqlColumns = implode(' VARCHAR(255), ', $this->columns) . ' VARCHAR(255)';
         } else {
             throw new DataFrameException("{$driver} is not yet supported for DataFrame query.");
+            // @codeCoverageIgnoreEnd
         }
 
         $pdo->exec("DROP TABLE IF EXISTS dataframe;");
