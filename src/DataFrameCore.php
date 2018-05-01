@@ -368,7 +368,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
                     $this->data[$i][$column] = $this->convertInt($row[$column]);
                 } elseif ($type === DataType::DATETIME) {
                     $this->data[$i][$column] = $this->convertDatetime($row[$column], $fromDateFormat, $toDateFormat);
-                } elseif ($type == 'CURRENCY') {
+                } elseif ($type == DataType::CURRENCY) {
                     $this->data[$i][$column] = $this->convertCurrency($row[$column]);
                 } elseif ($type == 'ACCOUNTING') {
                     $this->data[$i][$column] = $this->convertAccounting($row[$column]);
@@ -438,10 +438,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
         $value[1] = ($value[1] == '' or $value[1] == '0') ? '00' : $value[1];
 
+        $value[0] = floatval($value[0]);
         $dollars = number_format($value[0]).'.'.$value[1];
 
         if (substr($dollars, 0, 1) == '-') {
-            $dollars = '-$'.substr($dollars, 1);
+            $dollars = '-$' . ltrim($dollars, '-');
+        } elseif (substr($dollars, -1) == '-') {
+            $dollars = '-$' . rtrim($dollars, '-');
         } else {
             $dollars = '$'.$dollars;
         }

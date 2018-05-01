@@ -13,5 +13,6 @@ class DataType {
     const NUMERIC  = 0x001;
     const INTEGER  = 0x010;
     const DATETIME = 0x011;
+    const CURRENCY = 0x100;
 
 }
