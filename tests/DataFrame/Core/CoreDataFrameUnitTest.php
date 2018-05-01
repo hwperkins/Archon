@@ -155,4 +155,87 @@ class CoreDataFrameUnitTest extends TestCase
         $this->assertEquals(true, isset($this->df['a']));
         $this->assertEquals(false, isset($this->df['foo']));
     }
+
+    public function testApplyIndexMapValues()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap(array(
+            0 => 0,
+            2 => 0,
+        ), 'a');
+
+        $this->assertEquals([
+            ['a' => 0, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 0, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapFunction()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap(array(
+            0 => function($row) {
+                $row['a'] = 10;
+                return $row;
+            },
+            2 => function($row) {
+                $row['c'] = 20;
+                return $row;
+            },
+        ));
+
+        $this->assertEquals([
+            ['a' => 10, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 7, 'b' => 8, 'c' => 20],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapValueFunction()
+    {
+        $df = $this->df;
+
+        $my_function = function($value) {
+            if ($value < 4) {
+                return 0;
+            } else if ($value > 4) {
+                return 1;
+            } else {
+                return $value;
+            }
+        };
+
+        $df->applyIndexMap(array(
+            0 => $my_function,
+            2 => $my_function,
+        ), 'a');
+
+        $this->assertEquals([
+            ['a' => 0, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 1, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapArray()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap(array(
+            1 => array( 'a' => 301, 'b' => 404, 'c' => 500 ),
+        ));
+
+        $this->assertEquals([
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 301, 'b' => 404, 'c' => 500],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+
+
+
 }

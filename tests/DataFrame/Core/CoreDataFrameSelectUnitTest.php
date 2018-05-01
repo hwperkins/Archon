@@ -38,7 +38,6 @@ class CoreDataFrameSelectUnitTest extends TestCase
         $df = $df->query("UPDATE dataframe
         SET a = c * 2;");
 
-        print_r($df['a']->toArray());
         $expected = [
             ['a' => 6, 'b' => 2, 'c' => 3],
             ['a' => 12, 'b' => 5, 'c' => 6],

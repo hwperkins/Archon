@@ -74,6 +74,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Applies a user-defined function to each row of the DataFrame. The parameters of the function include the row
      * being iterated over, and optionally the index. ie: apply(function($el, $ix) { ... })
+     *
      * @param  Closure $f
      * @return DataFrameCore
      * @since  0.1.0
@@ -97,21 +98,38 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Apply new values to specific rows of the DataFrame using row index.
-     * applyByIndex([2=>'F',3=>'M','5'=>'F'], 'gender');
      *
-     * @param  array $values
+     * ie:
+     *      $df->infuseIndexMap('gender', [
+     *          2 => 'F',
+     *          3 => 'M',
+     *          5 => 'F'
+     *      ]);
+     *
+     * @param  array $map keys are row indices, values are static
      * @param  $column
      * @return DataFrameCore
      * @since  0.1.0
      */
-    public function applyByIndex(array $values, $column)
+    public function applyIndexMap(array $map, $column = null)
     {
+        return $this->apply(function(&$row, $i) use ($map, $column) {
+            if (isset($map[$i])) {
+                $value = $map[$i];
 
-        $this->mustHaveColumn($column);
-        foreach($values as $index => $value){
-          $this->data[$index][$column] = $value;
-        }
-        return $this;
+                if (is_callable($value) && is_null($column)) {
+                    $row = $value($row);
+                } else if (is_callable($value) && !is_null($column)) {
+                    $row[$column] = $value($row[$column]);
+                } else if (is_array($value) && is_null($column)) {
+                    $row = $value;
+                } else if ((is_string($value) || is_numeric($value) || is_bool($value)) && !is_null($column)) {
+                    $row[$column] = $value;
+                }
+            }
+
+            return $row;
+        });
     }
 
     /**
