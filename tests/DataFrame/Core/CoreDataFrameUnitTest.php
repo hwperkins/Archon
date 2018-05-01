@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 class CoreDataFrameUnitTest extends TestCase
 {
 
-    /**
-     * @var DataFrame
-     */
+    /** @var DataFrame */
     private $df;
 
     private $input = [
@@ -155,4 +153,193 @@ class CoreDataFrameUnitTest extends TestCase
         $this->assertEquals(true, isset($this->df['a']));
         $this->assertEquals(false, isset($this->df['foo']));
     }
+
+    public function testApplyIndexMapValues()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap([
+            0 => 0,
+            2 => 0,
+        ], 'a');
+
+        $this->assertEquals([
+            ['a' => 0, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 0, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapFunction()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap([
+            0 => function($row) {
+                $row['a'] = 10;
+                return $row;
+            },
+            2 => function($row) {
+                $row['c'] = 20;
+                return $row;
+            },
+        ]);
+
+        $this->assertEquals([
+            ['a' => 10, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 7, 'b' => 8, 'c' => 20],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapValueFunction()
+    {
+        $df = $this->df;
+
+        $my_function = function($value) {
+            if ($value < 4) {
+                return 0;
+            } else if ($value > 4) {
+                return 1;
+            } else {
+                return $value;
+            }
+        };
+
+        $df->applyIndexMap([
+            0 => $my_function,
+            2 => $my_function,
+        ], 'a');
+
+        $this->assertEquals([
+            ['a' => 0, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 1, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+    public function testApplyIndexMapArray()
+    {
+        $df = $this->df;
+
+        $df->applyIndexMap([
+            1 => [ 'a' => 301, 'b' => 404, 'c' => 500 ],
+        ]);
+
+        $this->assertEquals([
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 301, 'b' => 404, 'c' => 500],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
+    public function testFilter()
+    {
+        $df = $this->df;
+
+        $df = $df->array_filter(function($row) {
+            return $row['a'] > 4 || $row['a'] < 4;
+        });
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df->toArray());
+    }
+
+    public function testOffsetSetValueArray()
+    {
+        $df = $this->df;
+
+        $df[] = [ 'a' => 10, 'b' => 11, 'c' => 12 ];
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+            [ 'a' => 10, 'b' => 11, 'c' => 12 ],
+        ], $df->toArray());
+    }
+
+    public function testAppend()
+    {
+        $df1 = $this->df;
+        $df2 = $this->df;
+
+        // Test that appending an array with less than count of 1 will simply return the original DataFrame
+        $this->assertSame(
+            $df1,
+            $df1->append(DataFrame::fromArray(array()))
+        );
+
+        $df1->append($df2);
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df1->toArray());
+    }
+
+    public function testPregReplace()
+    {
+        $df1 = $this->df;
+
+        $df1->preg_replace('/[1-5]/', 'foo');
+
+        $this->assertEquals([
+            [ 'a' => 'foo', 'b' => 'foo', 'c' => 'foo' ],
+            [ 'a' => 'foo', 'b' => 'foo', 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df1->toArray());
+    }
+
+    public function testGroupBy() {
+        $df = DataFrame::fromArray([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 1, 'b' => 3, 'c' => 4 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 5 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 6 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 7 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 8 ],
+        ]);
+
+        $this->assertSame([
+            [ 'a' => 1 ],
+            [ 'a' => 2 ],
+            [ 'a' => 3 ],
+        ], $df->unique('a')->toArray());
+
+        $this->assertSame([
+            [ 'a' => 1, 'b' => 2 ],
+            [ 'a' => 1, 'b' => 3 ],
+            [ 'a' => 2, 'b' => 4 ],
+            [ 'a' => 3, 'b' => 5 ],
+        ], $df->unique(['a', 'b'])->toArray());
+
+        $this->assertSame([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 1, 'b' => 3, 'c' => 4 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 5 ],
+            [ 'a' => 2, 'b' => 4, 'c' => 6 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 7 ],
+            [ 'a' => 3, 'b' => 5, 'c' => 8 ],
+        ], $df->unique(['a', 'b', 'c'])->toArray());
+    }
+
+    public function testRename() {
+        $df = $this->df;
+
+        $df->renameColumn('a', 'foo');
+
+        $this->assertSame([
+            ['foo' => 1, 'b' => 2, 'c' => 3],
+            ['foo' => 4, 'b' => 5, 'c' => 6],
+            ['foo' => 7, 'b' => 8, 'c' => 9],
+        ], $df->toArray());
+    }
+
 }

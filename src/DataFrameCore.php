@@ -74,6 +74,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     /**
      * Applies a user-defined function to each row of the DataFrame. The parameters of the function include the row
      * being iterated over, and optionally the index. ie: apply(function($el, $ix) { ... })
+     *
      * @param  Closure $f
      * @return DataFrameCore
      * @since  0.1.0
@@ -97,28 +98,61 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Apply new values to specific rows of the DataFrame using row index.
-     * applyByIndex([2=>'F',3=>'M','5'=>'F'], 'gender');
-     * @param  Array $values
+     *
+     * If column is supplied, will apply to column.
+     * If column is absent, will apply to row.
+     *
+     * By column:
+     *      $df->applyIndexMap([
+     *          2 => 'foo',
+     *          3 => function($old_value) { return $new_value; },
+     *          5 => 'baz',
+     *      ], 'a');
+     *
+     * By row:
+     *      $df->applyIndexMap([
+     *          2 => function($old_row) { return $new_row; },
+     *          3 => [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+     *      ]);
+     *
+     * @param  array $map keys are row indices, values are static
      * @param  $column
      * @return DataFrameCore
      * @since  0.1.0
      */
-    public function applyByIndex(array $values, $column)
+    public function applyIndexMap(array $map, $column = null)
     {
-        $this->mustHaveColumn($column);
-        foreach($values as $index => $value){
-          $this->data[$index][$column] = $value;
-        }
-        return $this;
+        return $this->apply(function(&$row, $i) use ($map, $column) {
+            if (isset($map[$i])) {
+                $value = $map[$i];
+
+                if (is_callable($value) && is_null($column)) {
+                    $row = $value($row);
+                } else if (is_callable($value) && !is_null($column)) {
+                    $row[$column] = $value($row[$column]);
+                } else if (is_array($value) && is_null($column)) {
+                    $row = $value;
+                } else if ((is_string($value) || is_numeric($value) || is_bool($value)) && !is_null($column)) {
+                    $row[$column] = $value;
+                }
+            }
+
+            return $row;
+        });
     }
+
     /**
      * Filter DataFrame rows using user-defined function. The parameters of the function include the row
-     * being iterated over, and the index. ie: filter(function($row, $index) { ... })
+     * being iterated over, and the index.
+     *
+     * ie:
+     *      $df = $df->array_filter(function($row, $index) { ... });
+     *
      * @param  Closure $f
-     * @return DataFrameCore
+     * @return DataFrame
      * @since  0.1.0
      */
-    public function filter(Closure $f)
+    public function array_filter(Closure $f)
     {
         return DataFrame::fromArray(array_filter($this->data, $f, ARRAY_FILTER_USE_BOTH));
     }
@@ -145,10 +179,12 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'sqlite') {
             $sqlColumns = implode(', ', $this->columns);
+            // @codeCoverageIgnoreStart
         } elseif ($driver === 'mysql') {
             $sqlColumns = implode(' VARCHAR(255), ', $this->columns) . ' VARCHAR(255)';
         } else {
             throw new DataFrameException("{$driver} is not yet supported for DataFrame query.");
+            // @codeCoverageIgnoreEnd
         }
 
         $pdo->exec("DROP TABLE IF EXISTS dataframe;");
@@ -173,6 +209,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Assertion that the DataFrame must have the column specified. If not then an exception is thrown.
+     *
      * @param  $columnName
      * @throws InvalidColumnException
      * @since  0.1.0
@@ -186,6 +223,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Returns a boolean of whether the specified column exists.
+     *
      * @param  $columnName
      * @return bool
      * @since  0.1.0
@@ -201,6 +239,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Adds a new column to the DataFrame.
+     *
      * @internal
      * @param $columnName
      * @since 0.1.0
@@ -212,19 +251,20 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
-        /**
+    /**
      * Adds multiple columns to the DataFrame.
+     *
      * @internal
-     * @param $columnNames
+     * @param array $columnNames
      * @since 1.0.1
      */
-
-    private function addColumns($columnNames)
+    private function addColumns(array $columnNames)
     {
-        foreach($columnNames as $columnName){
+        foreach($columnNames as $columnName) {
             $this->addColumn($columnName);
         }
     }
+
     /**
      * Renames specific column.
      *
@@ -234,7 +274,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * @param $from
      * @param $to
      */
-    public function renameColumn($from, $to) {
+    public function renameColumn($from, $to)
+    {
         $this->mustHaveColumn($from);
 
         foreach ($this as $i => $row) {
@@ -245,6 +286,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
 
         $key = array_search($from, $this->columns);
+
         if(($key) !== false) {
             $this->columns[$key] = $to;
         }
@@ -252,6 +294,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Removes a column (and all associated data) from the DataFrame.
+     *
      * @param $columnName
      * @since 0.1.0
      */
@@ -274,7 +317,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
         $columns = $this->columns;
 
-        foreach ($other as $row) {
+        // TODO: Strange bug occurs when $other is used as an Iterator here, have to use toArray() to bypass
+        foreach ($other->toArray() as $row) {
             $newRow = [];
             foreach ($columns as $column) {
                 $newRow[$column] = $row[$column];
@@ -288,14 +332,16 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Replaces all occurences within the DataFrame of regex $pattern with string $replacement
+     *
      * @param $pattern
      * @param $replacement
+     * @return DataFrameCore
      */
-    public function pregReplace($pattern, $replacement)
+    public function preg_replace($pattern, $replacement)
     {
-        foreach($this->data as &$row) {
-            $row = preg_replace($pattern, $replacement, $row);
-        }
+        return $this->apply(function($row) use ($pattern, $replacement) {
+            return preg_replace($pattern, $replacement, $row);
+        });
     }
 
     /**
@@ -318,32 +364,26 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     {
         foreach ($this as $i => $row) {
             foreach ($typeMap as $column => $type) {
-                if ($type == 'DECIMAL') {
-                    $this->data[$i][$column] = $this->convertDecimal($row[$column]);
-                } elseif ($type == 'INT') {
+                if ($type === DataType::NUMERIC) {
+                    $this->data[$i][$column] = $this->convertNumeric($row[$column]);
+                } elseif ($type === DataType::INTEGER) {
                     $this->data[$i][$column] = $this->convertInt($row[$column]);
-                } elseif ($type == 'DATE') {
-                    $this->data[$i][$column] = $this->convertDate($row[$column], $fromDateFormat, $toDateFormat);
-                } elseif ($type == 'CURRENCY') {
+                } elseif ($type === DataType::DATETIME) {
+                    $this->data[$i][$column] = $this->convertDatetime($row[$column], $fromDateFormat, $toDateFormat);
+                } elseif ($type == DataType::CURRENCY) {
                     $this->data[$i][$column] = $this->convertCurrency($row[$column]);
-                } elseif ($type == 'ACCOUNTING') {
+                } elseif ($type == DataType::ACCOUNTING) {
                     $this->data[$i][$column] = $this->convertAccounting($row[$column]);
                 }
             }
         }
     }
 
-    private function convertDecimal($value)
+    private function convertNumeric($value)
     {
+        if (is_numeric($value)) return $value;
+
         $value = str_replace(['$', ',', ' '], '', $value);
-
-        if (substr($value, 1) == '.') {
-            $value = '0'.$value;
-        }
-
-        if ($value == '0' || $value == '' || $value == '-0.00') {
-            return '0.00';
-        }
 
         if (substr($value, -1) == '-') {
             $value = '-'.substr($value, 0, -1);
@@ -355,55 +395,42 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     private function convertInt($value)
     {
-        if ($value === '') {
-            return '0';
-        }
+        if (empty($value)) return 0;
 
         if (substr($value, -1) === '-') {
             $value = '-'.substr($value, 0, -1);
         }
 
-        return str_replace(',', '', $value);
+        $value = str_replace(['$', ',', ' '], '', $value);
+
+        return intval(str_replace(',', '', $value));
     }
 
-    private function convertDate($value, $fromFormat, $toFormat)
+    private function convertDatetime($value, $fromFormat, $toFormat)
     {
-        if ($value === '') {
-            return '0001-01-01';
+        if (empty($value)) {
+            return DateTime::createFromFormat('Y-m-d', '0001-01-01')->format($toFormat);
         }
 
-        if (is_array($fromFormat)) {
-            $errorParsingDate = false;
-            $currentFormat = null;
+        if (!is_array($fromFormat)) {
+            $fromFormat = [ $fromFormat ];
+        }
 
-            foreach ($fromFormat as $dateFormat) {
-                $currentFormat = $dateFormat;
-                $oldDateTime = DateTime::createFromFormat($dateFormat, $value);
-                if ($oldDateTime === false) {
-                    $errorParsingDate = true;
-                    continue;
-                } else {
-                    $newDateString = $oldDateTime->format($toFormat);
-                    return $newDateString;
-                }
-            }
+        $dateFormatSnapshot = null;
 
-            if ($errorParsingDate === true) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$currentFormat}");
-            }
+        foreach ($fromFormat as $dateFormat) {
+            $dateFormatSnapshot = $dateFormat;
 
-        } else {
-
-            $oldDateTime = DateTime::createFromFormat($fromFormat, $value);
+            $oldDateTime = DateTime::createFromFormat($dateFormat, $value);
             if ($oldDateTime === false) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$fromFormat}");
+                continue;
+            } else {
+                $newDateString = $oldDateTime->format($toFormat);
+                return $newDateString;
             }
-
-            $newDateString = $oldDateTime->format($toFormat);
-            return $newDateString;
         }
 
-        throw new RuntimeException("Error parsing date string: '{$value}' with date format: {$fromFormat}");
+        throw new RuntimeException("Error parsing date string '{$value}' with date format {$dateFormatSnapshot}");
     }
 
     private function convertCurrency($value)
@@ -413,10 +440,13 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
         $value[1] = ($value[1] == '' or $value[1] == '0') ? '00' : $value[1];
 
+        $value[0] = floatval($value[0]);
         $dollars = number_format($value[0]).'.'.$value[1];
 
         if (substr($dollars, 0, 1) == '-') {
-            $dollars = '-$'.substr($dollars, 1);
+            $dollars = '-$' . ltrim($dollars, '-');
+        } elseif (substr($dollars, -1) == '-') {
+            $dollars = '-$' . rtrim($dollars, '-');
         } else {
             $dollars = '$'.$dollars;
         }
@@ -431,42 +461,49 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         $value[0] = ($value[0] == '' or $value[0] == '-') ? '0' : $value[0];
         $value[1] = ($value[1] == '' or $value[1] == '0') ? '00' : $value[1];
 
+        $value[0] = floatval($value[0]);
         $dollars = number_format($value[0]) . '.' . $value[1];
 
         if (substr($dollars, 0, 1) == '-') {
-            $dollars = '('.substr($dollars, 1).')';
+            $dollars = '('.ltrim($dollars, '-').')';
+        } elseif(substr($dollars, -1) == '-') {
+            $dollars = '('.rtrim($dollars, '-').')';
         }
 
         return '$'.$dollars;
     }
 
     /**
-     * Will group data similar to a SQL group by.
+     * Returns unique values of given column(s)
      *
      * @param $columns
      * @return DataFrame
      */
-    public function groupBy($columns)
+    public function unique($columns)
     {
-        $groupedData = [];
+        if (!is_array($columns)) {
+            $columns = [ $columns ];
+        }
 
+        $groupedData = [];
         $uniqueColumns = [];
         foreach($this->data as $row) {
-
-            if (is_array($columns)) {
-                $uniqueData = null;
-                foreach ($columns as $column) {
-                    $uniqueData .= $row[$column];
-                }
-            } else {
-                $uniqueData = $row[$columns];
+            $uniqueKey = null;
+            foreach ($columns as $column) {
+                $uniqueKey .= $row[$column];
             }
 
-            if (isset($uniqueColumns[$uniqueData])) {
+            if (isset($uniqueColumns[$uniqueKey])) {
                 continue;
             } else {
-                $uniqueColumns[$uniqueData] = true;
-                $groupedData[] = $row;
+                $uniqueColumns[$uniqueKey] = true;
+
+                $new_row = array();
+                foreach ($columns as $column) {
+                    $new_row[$column] = $row[$column];
+                }
+
+                $groupedData[] = $new_row;
             }
         }
 
@@ -479,6 +516,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Provides isset($df['column']) functionality.
+     *
      * @internal
      * @param  mixed $columnName
      * @return bool
@@ -499,6 +537,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user retrieve DataFrame subsets from a two-dimensional array by
      * simply requesting an element of the instantiated DataFrame.
      *      ie: $fooDF = $df['foo'];
+     *
      * @internal
      * @param  mixed $columnName
      * @return DataFrame
@@ -531,6 +570,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      *          $df['foo'] = function ($foo) { return $foo + 1; };
      *          $df['foo'] = 'bar';
      *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
+     *
      * @internal
      * @param  mixed $targetColumn
      * @param  mixed $rightHandSide
@@ -552,6 +592,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a single-column DataFrame.
      *      ie:
      *          $df['bar'] = $df['foo'];
+     *
      * @internal
      * @param  $targetColumn
      * @param  DataFrame $df
@@ -583,6 +624,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a Closure.
      *      ie:
      *          $df['foo'] = function ($foo) { return $foo + 1; };
+     *
      * @internal
      * @param $targetColumn
      * @param Closure $f
@@ -599,7 +641,9 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      * Allows user set DataFrame columns from a variable and add new rows to Dataframe
      *      ie:
      *          $df['foo'] = 'bar';
-     *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
+     *
+     *          $df[] = [ 'foo' => 1, 'bar' => 2, 'baz' => 3 ];
+     *
      * @internal
      * @param $targetColumn
      * @param $value
@@ -607,22 +651,21 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     private function offsetSetValue($targetColumn, $value)
     {
-        if(trim($targetColumn!='')){
-          $this->addColumn($targetColumn);
-          foreach ($this as $i => $row) {
-              $this->data[$i][$targetColumn] = $value;
-          }
-        }elseif(is_array($value)){
-          foreach($value as $row){
-            $this->addColumns(array_keys($row));
-            $this->data[] = $row;
-          }
+        if (trim($targetColumn != '')) {
+            $this->addColumn($targetColumn);
+            foreach ($this as $i => $row) {
+                $this->data[$i][$targetColumn] = $value;
+            }
+        } elseif (is_array($value)) {
+            $this->addColumns(array_keys($value));
+            $this->data[] = $value;
         }
     }
 
     /**
      * Allows user to remove columns from the DataFrame using unset.
      *      ie: unset($df['column'])
+     *
      * @param  mixed $offset
      * @throws InvalidColumnException
      * @since  0.1.0
@@ -648,6 +691,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Return the current element
+     *
      * @link   http://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since  0.1.0
@@ -659,6 +703,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Move forward to next element
+     *
      * @link   http://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      * @since  0.1.0
@@ -670,6 +715,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Return the key of the current element
+     *
      * @link   http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      * @since  0.1.0
@@ -681,6 +727,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Checks if current position is valid
+     *
      * @link   http://php.net/manual/en/iterator.valid.php
      * @return boolean The return value will be casted to boolean and then evaluated.
      *                 Returns true on success or false on failure.
@@ -693,6 +740,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Rewind the Iterator to the first element
+     *
      * @link   http://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      * @since  0.1.0
@@ -708,6 +756,7 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     /**
      * Count elements of an object
+     *
      * @link   http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      *             The return value is cast to an integer.

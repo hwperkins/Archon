@@ -27,6 +27,38 @@ class HTMLDataFrameUnitTest extends TestCase
         $this->assertEquals($expected, $df->toHTML());
     }
 
+    public function testLimit()
+    {
+        $df = DataFrame::fromArray([
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            ['a' => 4, 'b' => 5, 'c' => 6],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+            ['a' => 10, 'b' => 11, 'c' => 12],
+        ]);
+
+        $expected = "<table>";
+        $expected .= "<thead><tr><th>a</th><th>b</th><th>c</th></tr></thead>";
+        $expected .= "<tfoot><tr><th>a</th><th>b</th><th>c</th></tr></tfoot>";
+        $expected .= "<tbody>";
+        $expected .= "<tr><td>1</td><td>2</td><td>3</td></tr>";
+        $expected .= "<tr><td>4</td><td>5</td><td>6</td></tr>";
+        $expected .= "</tbody>";
+        $expected .= "</table>";
+        $this->assertEquals($expected, $df->toHTML([ 'limit' => 2 ]));
+
+        $expected = "<table>";
+        $expected .= "<thead><tr><th>a</th><th>b</th><th>c</th></tr></thead>";
+        $expected .= "<tfoot><tr><th>a</th><th>b</th><th>c</th></tr></tfoot>";
+        $expected .= "<tbody>";
+        $expected .= "<tr><td>7</td><td>8</td><td>9</td></tr>";
+        $expected .= "<tr><td>10</td><td>11</td><td>12</td></tr>";
+        $expected .= "</tbody>";
+        $expected .= "</table>";
+        $this->assertEquals($expected, $df->toHTML([ 'offset' => 2, 'limit' => 2 ]));
+
+
+    }
+
     public function testPrettyToHTML()
     {
         $df = DataFrame::fromArray([

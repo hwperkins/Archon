@@ -34,7 +34,8 @@ final class HTML
         'quote' => "'",
         'datatable' => null,
         'colorColumns' => null,
-        'limit' => 5000
+        'limit' => 5000,
+        'offset' => 0,
     ];
 
     public function __construct(array $data)
@@ -69,6 +70,7 @@ final class HTML
 
         $colorColumnsOpt = $options['colorColumns'];
         $limitOpt = $options['limit'];
+        $offsetOpt = $options['offset'];
 
         $columns = current($data);
         $columns = array_keys($columns);
@@ -88,6 +90,10 @@ final class HTML
         $fnTR = $this->fnWrapText('<tr>', '</tr>');
 
         $columns = $fnTRTH($columns);
+
+        if ($offsetOpt > 0 and $offsetOpt < count($data)) {
+            $data = array_slice($data, $offsetOpt);
+        }
 
         if ($limitOpt > 0 and $limitOpt < count($data)) {
             $data = array_slice($data, 0, $limitOpt);
