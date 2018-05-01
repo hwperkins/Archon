@@ -43,6 +43,7 @@ class CoreDataFrameTypesUnitTest extends TestCase
             [ 'datetime' => '12/03/1996' ],
             [ 'datetime' => '03-2001-04' ],
             [ 'datetime' => 'Jun 04 2010' ],
+            [ 'datetime' => '' ],
         ]);
 
         $df->convertTypes([
@@ -53,7 +54,25 @@ class CoreDataFrameTypesUnitTest extends TestCase
             [ 'datetime' => '1996-03-12' ],
             [ 'datetime' => '2001-04-03' ],
             [ 'datetime' => '2010-06-04' ],
+            [ 'datetime' => '0001-01-01' ],
         ], $df->toArray());
+
+        $df->convertTypes([
+            'datetime' => DataType::DATETIME,
+        ], 'Y-m-d', 'M d Y');
+
+        $this->assertSame([
+            [ 'datetime' => 'Mar 12 1996' ],
+            [ 'datetime' => 'Apr 03 2001' ],
+            [ 'datetime' => 'Jun 04 2010' ],
+            [ 'datetime' => 'Jan 01 0001' ],
+        ], $df->toArray());
+
+        $this->expectExceptionMessage("Error parsing date string 'Mar 12 1996' with date format Y-m-d");
+        $df->convertTypes([
+            'datetime' => DataType::DATETIME,
+        ], 'Y-m-d', 'Y-m-d');
+
     }
 
 }

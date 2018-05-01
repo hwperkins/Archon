@@ -406,42 +406,29 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
     private function convertDatetime($value, $fromFormat, $toFormat)
     {
-        if ($value === '') {
-            return '0001-01-01';
+        if (empty($value)) {
+            return DateTime::createFromFormat('Y-m-d', '0001-01-01')->format($toFormat);
         }
 
-        if (is_array($fromFormat)) {
-            $errorParsingDate = false;
-            $currentFormat = null;
+        if (!is_array($fromFormat)) {
+            $fromFormat = [ $fromFormat ];
+        }
 
-            foreach ($fromFormat as $dateFormat) {
-                $currentFormat = $dateFormat;
-                $oldDateTime = DateTime::createFromFormat($dateFormat, $value);
-                if ($oldDateTime === false) {
-                    $errorParsingDate = true;
-                    continue;
-                } else {
-                    $newDateString = $oldDateTime->format($toFormat);
-                    return $newDateString;
-                }
-            }
+        $dateFormatSnapshot = null;
 
-            if ($errorParsingDate === true) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$currentFormat}");
-            }
+        foreach ($fromFormat as $dateFormat) {
+            $dateFormatSnapshot = $dateFormat;
 
-        } else {
-
-            $oldDateTime = DateTime::createFromFormat($fromFormat, $value);
+            $oldDateTime = DateTime::createFromFormat($dateFormat, $value);
             if ($oldDateTime === false) {
-                throw new RuntimeException("Error parsing date string '{$value}' with date format {$fromFormat}");
+                continue;
+            } else {
+                $newDateString = $oldDateTime->format($toFormat);
+                return $newDateString;
             }
-
-            $newDateString = $oldDateTime->format($toFormat);
-            return $newDateString;
         }
 
-        throw new RuntimeException("Error parsing date string: '{$value}' with date format: {$fromFormat}");
+        throw new RuntimeException("Error parsing date string '{$value}' with date format {$dateFormatSnapshot}");
     }
 
     private function convertCurrency($value)
