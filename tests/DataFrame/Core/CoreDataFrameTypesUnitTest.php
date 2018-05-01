@@ -75,27 +75,28 @@ class CoreDataFrameTypesUnitTest extends TestCase
 
     }
 
-    public function testConvertCurrency() {
+    public function testConvertCurrencyACCOUNTING() {
         $df = DataFrame::fromArray([
-            [ 'currency' => '1' ],
-            [ 'currency' => '-123456789' ],
-            [ 'currency' => '' ],
-            [ 'currency' => '123.45' ],
-            [ 'currency' => 'asdf' ],
-            [ 'currency' => 'asdf.56-' ],
+            [ 'currency' => '1',          'accounting' => '1'          ],
+            [ 'currency' => '-123456789', 'accounting' => '-123456789' ],
+            [ 'currency' => '',           'accounting' => ''           ],
+            [ 'currency' => '123.45',     'accounting' => '123.45'     ],
+            [ 'currency' => 'asdf',       'accounting' => 'asdf'       ],
+            [ 'currency' => 'asdf.56-',   'accounting' => 'asdf.56-'   ],
         ]);
 
         $df->convertTypes([
-            'currency' => DataType::CURRENCY,
+            'currency'   => DataType::CURRENCY,
+            'accounting' => DataType::ACCOUNTING,
         ]);
 
         $this->assertSame([
-            [ 'currency' => '$1.00' ],
-            [ 'currency' => '-$123,456,789.00' ],
-            [ 'currency' => '$0.00' ],
-            [ 'currency' => '$123.45' ],
-            [ 'currency' => '$0.00' ],
-            [ 'currency' => '-$0.56' ],
+            [ 'currency' => '$1.00',            'accounting' => '$1.00' ],
+            [ 'currency' => '-$123,456,789.00', 'accounting' => '$(123,456,789.00)' ],
+            [ 'currency' => '$0.00',            'accounting' => '$0.00' ],
+            [ 'currency' => '$123.45',          'accounting' => '$123.45' ],
+            [ 'currency' => '$0.00',            'accounting' => '$0.00' ],
+            [ 'currency' => '-$0.56',           'accounting' => '$(0.56)' ],
         ], $df->toArray());
 
     }
