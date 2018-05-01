@@ -96,6 +96,34 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
+     * Apply new values to specific rows of the DataFrame using row index.
+     * applyByIndex([2=>'F',3=>'M','5'=>'F'], 'gender');
+     * @param  Array $values
+     * @param  $column
+     * @return DataFrameCore
+     * @since  0.1.0
+     */
+    public function applyByIndex(array $values, $column)
+    {
+        $this->mustHaveColumn($column);
+        foreach($values as $index => $value){
+          $this->data[$index][$column] = $value;
+        }
+        return $this;
+    }
+    /**
+     * Filter DataFrame rows using user-defined function. The parameters of the function include the row
+     * being iterated over, and the index. ie: filter(function($row, $index) { ... })
+     * @param  Closure $f
+     * @return DataFrameCore
+     * @since  0.1.0
+     */
+    public function filter(Closure $f)
+    {
+        return DataFrame::fromArray(array_filter($this->data, $f, ARRAY_FILTER_USE_BOTH));
+    }
+    
+    /**
      * Allows SQL to be used to perform operations on the DataFrame
      *
      * Table name will always be 'dataframe'
@@ -184,6 +212,19 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         }
     }
 
+        /**
+     * Adds multiple columns to the DataFrame.
+     * @internal
+     * @param $columnNames
+     * @since 1.0.1
+     */
+
+    private function addColumns($columnNames)
+    {
+        foreach($columnNames as $columnName){
+            $this->addColumn($columnName);
+        }
+    }
     /**
      * Renames specific column.
      *
@@ -482,13 +523,14 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Allows user set DataFrame columns from a Closure, value, or another single-column DataFrame.
+     * Allows user set DataFrame columns from a Closure, value, array, or another single-column DataFrame.
      *      ie:
      *          $df[$targetColumn] = $rightHandSide
      *          $df['bar'] = $df['foo'];
      *          $df['bar'] = $df->foo;
      *          $df['foo'] = function ($foo) { return $foo + 1; };
      *          $df['foo'] = 'bar';
+     *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
      * @internal
      * @param  mixed $targetColumn
      * @param  mixed $rightHandSide
@@ -554,9 +596,10 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Allows user set DataFrame columns from a variable.
+     * Allows user set DataFrame columns from a variable and add new rows to Dataframe
      *      ie:
      *          $df['foo'] = 'bar';
+     *          $df[] = [['gender'=>'Female','name'=>'Luy'],['title'=>'Mr','name'=>'Noah']];
      * @internal
      * @param $targetColumn
      * @param $value
@@ -564,9 +607,16 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
      */
     private function offsetSetValue($targetColumn, $value)
     {
-        $this->addColumn($targetColumn);
-        foreach ($this as $i => $row) {
-            $this->data[$i][$targetColumn] = $value;
+        if(trim($targetColumn!='')){
+          $this->addColumn($targetColumn);
+          foreach ($this as $i => $row) {
+              $this->data[$i][$targetColumn] = $value;
+          }
+        }elseif(is_array($value)){
+          foreach($value as $row){
+            $this->addColumns(array_keys($row));
+            $this->data[] = $row;
+          }
         }
     }
 
