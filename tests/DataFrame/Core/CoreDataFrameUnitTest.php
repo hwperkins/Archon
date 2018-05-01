@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 class CoreDataFrameUnitTest extends TestCase
 {
 
-    /**
-     * @var DataFrame
-     */
+    /** @var DataFrame */
     private $df;
 
     private $input = [
@@ -261,5 +259,22 @@ class CoreDataFrameUnitTest extends TestCase
             [ 'a' => 7, 'b' => 8, 'c' => 9 ],
             [ 'a' => 10, 'b' => 11, 'c' => 12 ],
         ], $df->toArray());
+    }
+
+    public function testAppend()
+    {
+        $df1 = $this->df;
+        $df2 = $this->df;
+
+        $df1->append($df2);
+
+        $this->assertEquals([
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+            [ 'a' => 1, 'b' => 2, 'c' => 3 ],
+            [ 'a' => 4, 'b' => 5, 'c' => 6 ],
+            [ 'a' => 7, 'b' => 8, 'c' => 9 ],
+        ], $df1->toArray());
     }
 }

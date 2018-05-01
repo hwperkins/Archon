@@ -315,7 +315,8 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
 
         $columns = $this->columns;
 
-        foreach ($other as $row) {
+        // TODO: Strange bug occurs when $other is used as an Iterator here, have to use toArray() to bypass
+        foreach ($other->toArray() as $row) {
             $newRow = [];
             foreach ($columns as $column) {
                 $newRow[$column] = $row[$column];
