@@ -342,4 +342,87 @@ class CoreDataFrameUnitTest extends TestCase
         ], $df->toArray());
     }
 
+
+
+    public function testSortValues() {
+
+        // Single column
+        $unordered_df = DataFrame::fromArray([
+            ['a' => 1, 'x'=> 'a'],
+            ['a' => 3, 'x'=> 'b'],
+            ['a' => 2, 'x'=> 'c'],
+            ['a' => 4, 'x'=> 'd'],
+        ]);
+
+        $ordered_df = DataFrame::fromArray([
+            ['a' => 1, 'x'=> 'a'],
+            ['a' => 2, 'x'=> 'c'],
+            ['a' => 3, 'x'=> 'b'],
+            ['a' => 4, 'x'=> 'd'],
+        ]);
+
+        $unordered_df->sortValues('a');
+
+        $this->assertSame($unordered_df->toArray(), $ordered_df->toArray());
+
+
+        // Single column descending
+        $unordered_df = DataFrame::fromArray([
+            ['a' => 1, 'x'=> 'a'],
+            ['a' => 3, 'x'=> 'b'],
+            ['a' => 2, 'x'=> 'c'],
+            ['a' => 4, 'x'=> 'd'],
+        ]);
+
+        $ordered_df = DataFrame::fromArray([
+            ['a' => 1, 'x'=> 'a'],
+            ['a' => 3, 'x'=> 'b'],
+            ['a' => 2, 'x'=> 'c'],
+            ['a' => 4, 'x'=> 'd'],
+        ]);
+
+        $unordered_df->sortValues('a', false);
+
+        $this->assertSame($unordered_df->toArray(), $ordered_df->toArray());
+
+        // Double column, first a than b
+        $unordered_df = DataFrame::fromArray([
+            ['a' => 1, 'b' => 5, 'x'=> 'a'],
+            ['a' => 2, 'b' => 3, 'x'=> 'b'],
+            ['a' => 2, 'b' => 2, 'x'=> 'c'],
+            ['a' => 4, 'b' => 1, 'x'=> 'd'],
+        ]);
+
+        $ordered_df = DataFrame::fromArray([
+            ['a' => 1, 'b' => 5, 'x'=> 'a'],
+            ['a' => 2, 'b' => 2, 'x'=> 'c'],
+            ['a' => 2, 'b' => 3, 'x'=> 'b'],
+            ['a' => 4, 'b' => 1, 'x'=> 'd'],
+        ]);
+
+        $unordered_df->sortValues(['a', 'b']);
+
+        $this->assertSame($unordered_df->toArray(), $ordered_df->toArray());
+
+
+        // Double column, first b than a
+        $unordered_df = DataFrame::fromArray([
+            ['a' => 1, 'b' => 5, 'x'=> 'a'],
+            ['a' => 2, 'b' => 3, 'x'=> 'b'],
+            ['a' => 2, 'b' => 2, 'x'=> 'c'],
+            ['a' => 4, 'b' => 5, 'x'=> 'd'],
+        ]);
+
+        $ordered_df = DataFrame::fromArray([
+            ['a' => 2, 'b' => 2, 'x'=> 'c'],
+            ['a' => 2, 'b' => 3, 'x'=> 'b'],
+            ['a' => 1, 'b' => 5, 'x'=> 'a'],
+            ['a' => 4, 'b' => 5, 'x'=> 'd'],
+        ]);
+
+        $unordered_df->sortValues(['b', 'a']);
+
+        $this->assertSame($unordered_df->toArray(), $ordered_df->toArray());
+    }
+
 }

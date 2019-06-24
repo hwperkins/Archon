@@ -510,6 +510,32 @@ abstract class DataFrameCore implements ArrayAccess, Iterator, Countable
         return DataFrame::fromArray($groupedData);
     }
 
+    /**
+     * Sort the rows by its values
+     *
+     * @param $by string|string[] Columns to sort the values by
+     * @param $ascending bool Sort the values ascending (or if `false` descending)
+     * @return void
+     */
+    public function sortValues($by, $ascending=true)
+    {
+        if (!is_array($by)) {
+            $by = [ $by ];
+        }
+
+        usort($this->data, function($row_a, $row_b) use ($by, $ascending){
+            foreach($by as $col){
+                $value_a = $row_a[$col];
+                $value_b = $row_b[$col];
+                if($value_a != $value_b){
+                    return ($value_a > $value_b) * $ascending;
+                }
+            }
+            return true;
+        });
+
+    }
+
     /* *****************************************************************************************************************
      ******************************************* ArrayAccess Implementation ********************************************
      ******************************************************************************************************************/
