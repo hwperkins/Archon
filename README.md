@@ -37,6 +37,10 @@ composer require archon/dataframe
 
 ## Data Format Examples
 
+### Import required library
+
+`use Archon\DataFrame;`
+
 ### Instantiating from an array:
 
 ```php
